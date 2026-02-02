@@ -90,16 +90,25 @@ func main() {
 	defer db.Close()
 
 	// Initialize Repository
-	repo := postgres.NewAccountRepository(db.Pool)
+	repo := postgres.NewAccountRepository(db)
 
 	// Use the repository...
-	accounts, err := repo.List(ctx)
+	tenantID := "some-tenant-uuid"
+	accounts, err := repo.List(ctx, tenantID)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("Found %d accounts", len(accounts))
 }
 ```
+
+## Soft Delete Policy
+
+FinTrack Core implements a comprehensive soft delete strategy to maintain data auditability and prevent accidental data loss.
+
+- **Traceable Deletion**: Critical entities (`Accounts`, `Transactions`, `Attachments`) support full traceability by storing both the timestamp (`deactivated_at`) and the ID of the user who performed the action (`deactivated_by`).
+- **Standard Soft Delete**: Operational entities (`Users`, `Tenants`, `Tags`, `Categories`) use a standard `deactivated_at` timestamp.
+- **Join Table Policy**: Many-to-many associations like `Users <-> Tenants` are soft-deleted via timestamp, while lightweight associations like `Transactions <-> Tags` are hard-deleted if they lack specific audit requirements in the schema.
 
 ### Environment Variables
 
