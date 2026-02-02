@@ -1,5 +1,5 @@
 -- schema created at https://dbdiagram.io/d/fintrack-6980c9a9bd82f5fce2609709
-CREATE TYPE IF NOT EXISTS "account_type" AS ENUM (
+CREATE TYPE IF NOT EXISTS"account_type" AS ENUM (
   'bank',
   'cash',
   'credit_card',
@@ -7,7 +7,7 @@ CREATE TYPE IF NOT EXISTS "account_type" AS ENUM (
   'other'
 );
 
-CREATE TYPE IF NOT EXISTS "credit_card_brand" AS ENUM (
+CREATE TYPE IF NOT EXISTS"credit_card_brand" AS ENUM (
   'visa',
   'mastercard',
   'amex',
@@ -19,7 +19,7 @@ CREATE TYPE IF NOT EXISTS "credit_card_brand" AS ENUM (
   'unknown'
 );
 
-CREATE TYPE IF NOT EXISTS "transaction_type" AS ENUM (
+CREATE TYPE IF NOT EXISTS"transaction_type" AS ENUM (
   'credit',
   'debit',
   'transfer',
@@ -113,6 +113,7 @@ CREATE TABLE IF NOT EXISTS "transactions" (
   "accrual_month" "VARCHAR(6)" NOT NULL,
   "transaction_type" transaction_type NOT NULL,
   "category_id" UUID NOT NULL,
+  "comments" TEXT,
   "due_date" DATE NOT NULL,
   "payment_date" DATE,
   "created_at" "TIMESTAMPTZ" NOT NULL DEFAULT (CURRENT_TIMESTAMP),
@@ -129,41 +130,40 @@ CREATE TABLE IF NOT EXISTS "transactions_tags" (
   PRIMARY KEY ("transaction_id", "tag_id")
 );
 
-CREATE INDEX IF NOT EXISTS ON "tenants" USING HASH ("deactivated_at");
+CREATE TABLE IF NOT EXISTS "transaction_attachments" (
+  "id" UUID PRIMARY KEY DEFAULT 'gen_random_uuid()',
+  "transaction_id" UUID NOT NULL,
+  "name" TEXT NOT NULL,
+  "path" TEXT NOT NULL,
+  "created_at" "TIMESTAMPTZ" NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "created_by" UUID NOT NULL,
+  "updated_at" "TIMESTAMPTZ" NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "updated_by" UUID NOT NULL,
+  "deactivated_at" "TIMESTAMPTZ",
+  "deactivated_by" UUID
+);
 
-CREATE INDEX IF NOT EXISTS ON "users" USING HASH ("deactivated_at");
+CREATE INDEX IF NOT EXISTS ON "users_tenants" USING BTREE ("tenant_id");
 
-CREATE INDEX IF NOT EXISTS ON "users_tenants" USING HASH ("tenant_id");
+CREATE INDEX IF NOT EXISTS ON "users_tenants" USING BTREE ("user_id");
 
-CREATE INDEX IF NOT EXISTS ON "users_tenants" USING HASH ("user_id");
+CREATE INDEX IF NOT EXISTS ON "accounts" USING BTREE ("tenant_id");
 
-CREATE INDEX IF NOT EXISTS ON "users_tenants" USING HASH ("deactivated_at");
+CREATE UNIQUE INDEX ON "credit_card_info" ("account_id", "deactivated_at");
 
-CREATE INDEX IF NOT EXISTS ON "accounts" USING HASH ("tenant_id");
+CREATE INDEX IF NOT EXISTS ON "credit_card_info" USING BTREE ("account_id");
 
-CREATE INDEX IF NOT EXISTS ON "accounts" USING HASH ("deactivated_at");
+CREATE INDEX IF NOT EXISTS ON "tags" USING BTREE ("tenant_id");
 
-CREATE UNIQUE INDEX IF NOT EXISTS ON "credit_card_info" ("account_id", "deactivated_at");
+CREATE INDEX IF NOT EXISTS ON "categories" USING BTREE ("tenant_id");
 
-CREATE INDEX IF NOT EXISTS ON "credit_card_info" USING HASH ("deactivated_at");
+CREATE INDEX IF NOT EXISTS ON "transactions" USING BTREE ("tenant_id");
 
-CREATE INDEX IF NOT EXISTS ON "credit_card_info" USING HASH ("account_id");
-
-CREATE INDEX IF NOT EXISTS ON "tags" USING HASH ("tenant_id");
-
-CREATE INDEX IF NOT EXISTS ON "tags" USING HASH ("deactivated_at");
-
-CREATE INDEX IF NOT EXISTS ON "categories" USING HASH ("tenant_id");
-
-CREATE INDEX IF NOT EXISTS ON "categories" USING HASH ("deactivated_at");
-
-CREATE INDEX IF NOT EXISTS ON "transactions" USING HASH ("tenant_id");
-
-CREATE INDEX IF NOT EXISTS ON "transactions" USING HASH ("accrual_month");
+CREATE INDEX IF NOT EXISTS ON "transactions" USING BTREE ("accrual_month");
 
 CREATE INDEX IF NOT EXISTS ON "transactions" ("transaction_type");
 
-CREATE INDEX IF NOT EXISTS ON "transactions" USING HASH ("deactivated_at");
+CREATE INDEX IF NOT EXISTS ON "transaction_attachments" USING BTREE ("transaction_id");
 
 COMMENT ON COLUMN "accounts"."color" IS 'RGBA color (eg.: #ffAABB11';
 
@@ -221,9 +221,18 @@ ALTER TABLE "transactions_tags" ADD FOREIGN KEY ("transaction_id") REFERENCES "t
 
 ALTER TABLE "transactions_tags" ADD FOREIGN KEY ("tag_id") REFERENCES "tags" ("id");
 
+ALTER TABLE "transaction_attachments" ADD FOREIGN KEY ("transaction_id") REFERENCES "transactions" ("id");
+
+ALTER TABLE "transaction_attachments" ADD FOREIGN KEY ("created_by") REFERENCES "users" ("id");
+
+ALTER TABLE "transaction_attachments" ADD FOREIGN KEY ("updated_by") REFERENCES "users" ("id");
+
+ALTER TABLE "transaction_attachments" ADD FOREIGN KEY ("deactivated_by") REFERENCES "users" ("id");
+
 
 ---- create above / drop below ----
 
+DROP TABLE IF EXISTS "transaction_attachments";
 DROP TABLE IF EXISTS "transactions_tags";
 DROP TABLE IF EXISTS "transactions";
 DROP TABLE IF EXISTS "categories";
