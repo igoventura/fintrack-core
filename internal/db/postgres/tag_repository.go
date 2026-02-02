@@ -66,7 +66,7 @@ func (r *TagRepository) Update(ctx context.Context, t *domain.Tag) error {
 }
 
 func (r *TagRepository) Delete(ctx context.Context, id string) error {
-	query := `DELETE FROM tags WHERE id = $1`
+	query := `UPDATE tags SET deactivated_at = CURRENT_TIMESTAMP WHERE id = $1`
 	_, err := r.db.Pool.Exec(ctx, query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete tag: %w", err)

@@ -59,7 +59,7 @@ func (r *UserRepository) Update(ctx context.Context, u *domain.User) error {
 }
 
 func (r *UserRepository) Delete(ctx context.Context, id string) error {
-	query := `DELETE FROM users WHERE id = $1`
+	query := `UPDATE users SET deactivated_at = CURRENT_TIMESTAMP WHERE id = $1`
 	_, err := r.db.Pool.Exec(ctx, query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete user: %w", err)
@@ -77,7 +77,7 @@ func (r *UserRepository) AddUserToTenant(ctx context.Context, userID, tenantID s
 }
 
 func (r *UserRepository) RemoveUserFromTenant(ctx context.Context, userID, tenantID string) error {
-	query := `DELETE FROM users_tenants WHERE user_id = $1 AND tenant_id = $2`
+	query := `UPDATE users_tenants SET deactivated_at = CURRENT_TIMESTAMP WHERE user_id = $1 AND tenant_id = $2`
 	_, err := r.db.Pool.Exec(ctx, query, userID, tenantID)
 	if err != nil {
 		return fmt.Errorf("failed to remove user from tenant: %w", err)

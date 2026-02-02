@@ -77,7 +77,7 @@ type AccountRepository interface {
 	List(ctx context.Context, tenantID string) ([]Account, error)
 	Create(ctx context.Context, acc *Account) error
 	Update(ctx context.Context, acc *Account) error
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id string, userID string) error
 
 	GetCreditCardInfo(ctx context.Context, accountID string) (*CreditCardInfo, error)
 	UpsertCreditCardInfo(ctx context.Context, info *CreditCardInfo) error

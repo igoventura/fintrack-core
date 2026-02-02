@@ -65,9 +65,9 @@ func (r *TransactionRepository) Update(ctx context.Context, t *domain.Transactio
 	return nil
 }
 
-func (r *TransactionRepository) Delete(ctx context.Context, id string) error {
-	query := `DELETE FROM transactions WHERE id = $1`
-	_, err := r.db.Pool.Exec(ctx, query, id)
+func (r *TransactionRepository) Delete(ctx context.Context, id string, userID string) error {
+	query := `UPDATE transactions SET deactivated_at = CURRENT_TIMESTAMP, deactivated_by = $2 WHERE id = $1`
+	_, err := r.db.Pool.Exec(ctx, query, id, userID)
 	if err != nil {
 		return fmt.Errorf("failed to delete transaction: %w", err)
 	}
@@ -122,9 +122,9 @@ func (r *TransactionRepository) AddAttachment(ctx context.Context, a *domain.Tra
 	return nil
 }
 
-func (r *TransactionRepository) RemoveAttachment(ctx context.Context, id string) error {
-	query := `DELETE FROM transaction_attachments WHERE id = $1`
-	_, err := r.db.Pool.Exec(ctx, query, id)
+func (r *TransactionRepository) RemoveAttachment(ctx context.Context, id string, userID string) error {
+	query := `UPDATE transaction_attachments SET deactivated_at = CURRENT_TIMESTAMP, deactivated_by = $2 WHERE id = $1`
+	_, err := r.db.Pool.Exec(ctx, query, id, userID)
 	if err != nil {
 		return fmt.Errorf("failed to remove attachment: %w", err)
 	}

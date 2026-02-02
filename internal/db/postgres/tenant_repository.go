@@ -47,7 +47,7 @@ func (r *TenantRepository) Update(ctx context.Context, t *domain.Tenant) error {
 }
 
 func (r *TenantRepository) Delete(ctx context.Context, id string) error {
-	query := `DELETE FROM tenants WHERE id = $1`
+	query := `UPDATE tenants SET deactivated_at = CURRENT_TIMESTAMP WHERE id = $1`
 	_, err := r.db.Pool.Exec(ctx, query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete tenant: %w", err)

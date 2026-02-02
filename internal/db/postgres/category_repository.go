@@ -66,7 +66,7 @@ func (r *CategoryRepository) Update(ctx context.Context, c *domain.Category) err
 }
 
 func (r *CategoryRepository) Delete(ctx context.Context, id string) error {
-	query := `DELETE FROM categories WHERE id = $1`
+	query := `UPDATE categories SET deactivated_at = CURRENT_TIMESTAMP WHERE id = $1`
 	_, err := r.db.Pool.Exec(ctx, query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete category: %w", err)

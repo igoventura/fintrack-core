@@ -65,9 +65,9 @@ func (r *AccountRepository) Update(ctx context.Context, a *domain.Account) error
 	return nil
 }
 
-func (r *AccountRepository) Delete(ctx context.Context, id string) error {
-	query := `DELETE FROM accounts WHERE id = $1`
-	_, err := r.db.Pool.Exec(ctx, query, id)
+func (r *AccountRepository) Delete(ctx context.Context, id string, userID string) error {
+	query := `UPDATE accounts SET deactivated_at = CURRENT_TIMESTAMP, deactivated_by = $2 WHERE id = $1`
+	_, err := r.db.Pool.Exec(ctx, query, id, userID)
 	if err != nil {
 		return fmt.Errorf("failed to delete account: %w", err)
 	}

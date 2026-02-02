@@ -64,7 +64,7 @@ type TransactionRepository interface {
 	List(ctx context.Context, tenantID string) ([]Transaction, error)
 	Create(ctx context.Context, tx *Transaction) error
 	Update(ctx context.Context, tx *Transaction) error
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id string, userID string) error
 
 	// Tag associations
 	AddTagToTransaction(ctx context.Context, transactionID, tagID string) error
@@ -73,6 +73,6 @@ type TransactionRepository interface {
 
 	// Attachment associations
 	AddAttachment(ctx context.Context, attachment *TransactionAttachment) error
-	RemoveAttachment(ctx context.Context, id string) error
+	RemoveAttachment(ctx context.Context, id string, userID string) error
 	ListAttachments(ctx context.Context, transactionID string) ([]TransactionAttachment, error)
 }
