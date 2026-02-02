@@ -24,9 +24,8 @@ go mod tidy
 echo "Updating OpenAPI documentation..."
 make swagger
 
-# 5. Check if any files were changed by the above steps
-# If they were, we want to fail the commit and ask the user to add the changes.
-if [ -n "$(git status --short)" ]; then
+# 5. Check if any files were changed by the above steps (unstaged or untracked)
+if git status --porcelain | grep -q '^.[^ ]'; then
     echo "--------------------------------------------------------"
     echo "WARNING: Some files were modified by pre-commit checks."
     echo "--------------------------------------------------------"
