@@ -42,3 +42,9 @@ test:
 swagger:
 	@echo "Generating Swagger documentation..."
 	@go run github.com/swaggo/swag/cmd/swag init -g cmd/api/main.go -o docs --ot yaml
+
+install-hooks:
+	@echo "Installing git hooks..."
+	@chmod +x scripts/pre-commit
+	@ln -sf ../../scripts/pre-commit .git/hooks/pre-commit
+	@echo "Hooks installed successfully!"

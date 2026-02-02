@@ -8,6 +8,7 @@ require (
 	github.com/jackc/tern/v2 v2.3.5
 	github.com/joho/godotenv v1.5.1
 	github.com/mvrilo/go-redoc v0.1.5
+	github.com/swaggo/swag v1.16.6
 )
 
 require (
@@ -59,7 +60,6 @@ require (
 	github.com/spf13/cast v1.7.0 // indirect
 	github.com/spf13/cobra v1.8.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/swaggo/swag v1.16.6 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.0 // indirect
 	github.com/urfave/cli/v2 v2.3.0 // indirect

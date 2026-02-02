@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# FinTrack Core Pre-commit Hook
+# Runs formatting, linting, and documentation checks before committing.
+
+set -e
+
+echo "Running pre-commit checks..."
+
+# 1. Format code
+echo "Checking formatting (go fmt)..."
+go fmt ./...
+
+# 2. Run vet
+echo "Running static analysis (go vet)..."
+go vet ./...
+
+# 3. Tidy modules
+echo "Checking dependencies (go mod tidy)..."
+go mod tidy
+
+# 4. Regenerate documentation
+# This ensures that the documentation is always in sync with code annotations.
+echo "Updating OpenAPI documentation..."
+make swagger
+
+# 5. Check if any files were changed by the above steps
+# If they were, we want to fail the commit and ask the user to add the changes.
+if [ -n "$(git status --short)" ]; then
+    echo "--------------------------------------------------------"
+    echo "WARNING: Some files were modified by pre-commit checks."
+    echo "Please review the changes, 'git add' them, and try again."
+    echo "--------------------------------------------------------"
+    git add --all
+fi
+
+echo "All pre-commit checks passed!"
+exit 0

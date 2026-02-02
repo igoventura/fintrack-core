@@ -32,6 +32,7 @@ make new-migration name=xxx  # Create a new migration file
 make tidy           # Run go mod tidy
 make test           # Run all tests
 make swagger        # Regenerate OpenAPI documentation using swag
+make install-hooks  # Install git pre-commit hooks
 ```
 
 ## Migrations
