@@ -41,24 +41,24 @@ The center of the application. It contains entities and repository interfaces.
 
 ### 2. Service Layer (`/internal/service`)
 Contains the business logic (Use Cases). It acts as an orchestrator between the API layer and the Domain.
-- **Dependency**: Depends only on the interfaces defined in `/domain`.
+- **Responsibility**: Orchestrates domain logic and implements business rules.
+- **Dependency**: Receives and returns **Domain Entities** (or primitives). It should NOT know about DTOs.
+- **Rule**: Pure business logic. No JSON tags, no validator tags, no web concerns.
 
 ### 3. API Layer (`/internal/api`)
-Handles all HTTP-specific logic. 
-- **Handlers**: Parse requests, call services, and return responses.
-- **DTOs**: Ensure we don't leak internal domain details (like password hashes) to the outside world.
-- **Redoc**: Served via the router layer using `go-redoc` to render the `docs/openapi.yaml`.
-
-### 4. Database Layer (`/internal/db`)
-Handles the actual persistence.
-- **Implementation**: Implements the repository interfaces defined in `/domain`.
+Handles all HTTP-specific logic using the **Gin** framework. 
+- **Handlers**: Act as a "Translator". They parse JSON into **DTOs** using Gin's binding, map those DTOs to **Domain Entities** to call the service, and map returned entities back to **Response DTOs**.
+- **DTOs**: Located in `/internal/api/dto`. These contain the JSON tags, validation rules (using Gin's default validator), and OpenAPI annotations.
+- **Redoc**: Integrated via `github.com/mvrilo/go-redoc` to render the `docs/openapi.yaml` at the `/docs` endpoint.
 
 ---
 
-## Dependency Flow
-Dependency should always point **inwards** towards the domain.
+## Data Flow & Mapping
 
-`Handler (API)` -> `Service (Business Logic)` -> `Repository (Domain Interface)` <- `Postgres (DB Implementation)`
+To maintain strict isolation, mapping happens in the **API layer**:
+
+1. **Request**: `JSON` → `Handler` → `mapping to Entity` → `Service`
+2. **Response**: `Service` → `Domain Entity` → `Handler` → `mapping to DTO` → `JSON`
 
 ---
 

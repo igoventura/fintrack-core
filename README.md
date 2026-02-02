@@ -1,6 +1,6 @@
 # FinTrack Core
 
-FinTrack Core is a Go library providing the foundational domain models and persistence logic for the FinTrack ecosystem. It is designed with modularity and testability in mind, following a domain-driven approach.
+FinTrack Core is a Web API providing the foundational financial tracking logic for the FinTrack ecosystem. It is built with Go, following Clean Architecture principles to ensure modularity, testability, and clear separation of concerns.
 
 ## Structure
 
@@ -52,51 +52,29 @@ go get github.com/igoventura/fintrack-core
 
 ### Usage
 
-Initialize the PostgreSQL connection and the repository using environment variables (standard `.env` file supported via `godotenv`):
+The API can be run locally via Docker (recommended) or standalone.
 
-```go
-package main
+#### Using Docker (Infrastructure included)
+```bash
+make compose
+```
+Once running, the API is available at `http://localhost:8080`.
 
-import (
-	"context"
-	"log"
-	"os"
+#### Standalone Execution
+```bash
+# Ensure .env is configured
+go run cmd/api/main.go
+```
 
-	"github.com/igoventura/fintrack-core/internal/db/postgres"
-	"github.com/joho/godotenv"
-)
+### Documentation (OpenAPI / Redoc)
 
-func main() {
-	// Load .env file
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using system environment variables")
-	}
+The API automatically serves interactive documentation:
+- **Redoc UI**: [http://localhost:8080/docs](http://localhost:8080/docs)
+- **OpenAPI Spec**: [http://localhost:8080/openapi.yaml](http://localhost:8080/openapi.yaml)
 
-	ctx := context.Background()
-	
-	// Initialize Connection Pool
-	connStr := os.Getenv("DATABASE_URL")
-	if connStr == "" {
-		log.Fatal("DATABASE_URL environment variable is required")
-	}
-
-	db, err := postgres.NewDB(ctx, connStr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	// Initialize Repository
-	repo := postgres.NewAccountRepository(db)
-
-	// Use the repository...
-	tenantID := "some-tenant-uuid"
-	accounts, err := repo.List(ctx, tenantID)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Found %d accounts", len(accounts))
-}
+### Health Check
+```bash
+curl http://localhost:8080/health
 ```
 
 ## Soft Delete Policy

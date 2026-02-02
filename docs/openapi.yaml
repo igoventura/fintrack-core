@@ -1,0 +1,12 @@
+openapi: 3.0.3
+info:
+  title: FinTrack API
+  description: Financial tracking API for personal and business use.
+  version: 1.0.0
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: API is healthy
