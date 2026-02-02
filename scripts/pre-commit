@@ -29,7 +29,6 @@ make swagger
 if [ -n "$(git status --short)" ]; then
     echo "--------------------------------------------------------"
     echo "WARNING: Some files were modified by pre-commit checks."
-    echo "Please review the changes, 'git add' them, and try again."
     echo "--------------------------------------------------------"
     git add --all
 fi
