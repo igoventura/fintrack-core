@@ -18,6 +18,7 @@ help:
 
 compose:
 	@echo "Running docker compose..."
+	@make swagger
 	@docker compose up -d --build
 
 migrate:

@@ -10,7 +10,7 @@ import (
 )
 
 type AuthService interface {
-	Register(ctx context.Context, email, password string) (*dto.AuthResponse, error)
+	Register(ctx context.Context, email, password, fullName string) (*dto.AuthResponse, error)
 	Login(ctx context.Context, email, password string) (*dto.AuthResponse, error)
 }
 
@@ -26,10 +26,13 @@ func NewSupabaseAuthService(projectID, apiKey string, userService *UserService) 
 	}
 }
 
-func (s *SupabaseAuthService) Register(ctx context.Context, email, password string) (*dto.AuthResponse, error) {
+func (s *SupabaseAuthService) Register(ctx context.Context, email, password, fullName string) (*dto.AuthResponse, error) {
 	req := types.SignupRequest{
 		Email:    email,
 		Password: password,
+		Data: map[string]any{
+			"full_name": fullName,
+		},
 	}
 	resp, err := s.client.Signup(req)
 	if err != nil {
@@ -39,7 +42,7 @@ func (s *SupabaseAuthService) Register(ctx context.Context, email, password stri
 	user := &domain.User{
 		Email:      email,
 		SupabaseID: resp.User.ID.String(),
-		Name:       resp.User.UserMetadata["full_name"].(string),
+		Name:       fullName,
 	}
 	if err := s.userService.CreateUser(ctx, user); err != nil {
 		return nil, err

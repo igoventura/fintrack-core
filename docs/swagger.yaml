@@ -57,24 +57,24 @@ definitions:
         type: number
       name:
         type: string
-      tenant_id:
-        type: string
       type:
         $ref: '#/definitions/domain.AccountType'
     required:
     - name
-    - tenant_id
     - type
     type: object
   dto.RegisterRequest:
     properties:
       email:
         type: string
+      full_name:
+        type: string
       password:
         minLength: 6
         type: string
     required:
     - email
+    - full_name
     - password
     type: object
   dto.User:
@@ -109,8 +109,8 @@ paths:
       description: list accounts by tenant ID
       parameters:
       - description: Tenant ID
-        in: query
-        name: tenant_id
+        in: header
+        name: X-Tenant-ID
         required: true
         type: string
       produces:
@@ -126,6 +126,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - AuthPassword: []
       summary: List accounts
       tags:
       - accounts
@@ -140,6 +142,11 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/dto.CreateAccountRequest'
+      - description: Tenant ID
+        in: header
+        name: X-Tenant-ID
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -151,6 +158,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - AuthPassword: []
       summary: Create an account
       tags:
       - accounts
@@ -163,11 +172,6 @@ paths:
       - description: Account ID
         in: path
         name: id
-        required: true
-        type: string
-      - description: Tenant ID
-        in: header
-        name: X-Tenant-ID
         required: true
         type: string
       produces:
@@ -220,7 +224,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Register a new user with email and password
+      description: Register a new user with full name, email and password
       parameters:
       - description: Register User
         in: body

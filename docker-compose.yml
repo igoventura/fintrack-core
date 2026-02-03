@@ -37,6 +37,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: fintrack-api
+    restart: always
     depends_on:
       db:
         condition: service_healthy
@@ -49,6 +50,11 @@ services:
       PORT: 8080
       SUPABASE_PROJECT_REF: ${SUPABASE_PROJECT_REF}
       SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/health" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   db_data:

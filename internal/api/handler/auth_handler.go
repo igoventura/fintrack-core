@@ -18,7 +18,7 @@ func NewAuthHandler(service service.AuthService) *AuthHandler {
 
 // Register godoc
 // @Summary Register a new user
-// @Description Register a new user with email and password
+// @Description Register a new user with full name, email and password
 // @Tags auth
 // @Accept  json
 // @Produce  json
@@ -33,7 +33,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.service.Register(c.Request.Context(), req.Email, req.Password)
+	resp, err := h.service.Register(c.Request.Context(), req.Email, req.Password, req.FullName)
 	if err != nil {
 		ErrorJSON(c, http.StatusBadRequest, err.Error())
 		return

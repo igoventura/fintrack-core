@@ -24,19 +24,17 @@ func NewAccountHandler(s *service.AccountService) *AccountHandler {
 // @Accept  json
 // @Produce  json
 // @Param id path string true "Account ID"
-// @Param X-Tenant-ID header string true "Tenant ID"
 // @Security AuthPassword
 // @Success 200 {object} dto.AccountResponse
 // @Failure 404 {object} handler.ErrorResponse
 // @Router /accounts/{id} [get]
 func (h *AccountHandler) Get(c *gin.Context) {
-	tenantID := domain.GetTenantID(c.Request.Context())
-	if tenantID == "" {
-		ErrorJSON(c, http.StatusBadRequest, "tenant_id is required")
+	id := c.Param("id")
+	if id == "" {
+		ErrorJSON(c, http.StatusBadRequest, "Account ID is required")
 		return
 	}
 
-	id := c.Param("id")
 	acc, err := h.service.GetAccount(c.Request.Context(), id)
 	if err != nil {
 		ErrorJSON(c, http.StatusNotFound, "Account not found")
@@ -52,12 +50,13 @@ func (h *AccountHandler) Get(c *gin.Context) {
 // @Tags accounts
 // @Accept  json
 // @Produce  json
-// @Param tenant_id query string true "Tenant ID"
+// @Param X-Tenant-ID header string true "Tenant ID"
+// @Security AuthPassword
 // @Success 200 {array} dto.AccountResponse
 // @Failure 400 {object} handler.ErrorResponse
 // @Router /accounts [get]
 func (h *AccountHandler) List(c *gin.Context) {
-	tenantID := c.Query("tenant_id")
+	tenantID := domain.GetTenantID(c.Request.Context())
 	if tenantID == "" {
 		ErrorJSON(c, http.StatusBadRequest, "tenant_id is required")
 		return
@@ -84,6 +83,8 @@ func (h *AccountHandler) List(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param account body dto.CreateAccountRequest true "Create account"
+// @Param X-Tenant-ID header string true "Tenant ID"
+// @Security AuthPassword
 // @Success 201 {object} dto.AccountResponse
 // @Failure 400 {object} handler.ErrorResponse
 // @Router /accounts [post]
@@ -94,9 +95,19 @@ func (h *AccountHandler) Create(c *gin.Context) {
 		return
 	}
 
-	// For now, we stub the creator ID. In a real app, this would come from the auth context.
-	creatorID := "00000000-0000-0000-0000-000000000001"
-	acc := req.ToEntity(creatorID)
+	tenantID := domain.GetTenantID(c.Request.Context())
+	if tenantID == "" {
+		ErrorJSON(c, http.StatusBadRequest, "X-Tenant-ID header is required")
+		return
+	}
+
+	userId := domain.GetUserID(c.Request.Context())
+	if userId == "" {
+		ErrorJSON(c, http.StatusBadRequest, "User not found")
+		return
+	}
+
+	acc := req.ToEntity(userId, tenantID)
 
 	if err := h.service.CreateAccount(c.Request.Context(), acc); err != nil {
 		ErrorJSON(c, http.StatusInternalServerError, "Failed to create account")

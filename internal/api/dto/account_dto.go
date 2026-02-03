@@ -35,7 +35,6 @@ func MapAccountToResponse(acc *domain.Account) *AccountResponse {
 }
 
 type CreateAccountRequest struct {
-	TenantID       string             `json:"tenant_id" validate:"required"`
 	Name           string             `json:"name" validate:"required"`
 	InitialBalance float64            `json:"initial_balance"`
 	Color          string             `json:"color"`
@@ -44,10 +43,10 @@ type CreateAccountRequest struct {
 	Type           domain.AccountType `json:"type" validate:"required"`
 }
 
-func (r *CreateAccountRequest) ToEntity(creatorID string) *domain.Account {
+func (r *CreateAccountRequest) ToEntity(creatorID string, tenantID string) *domain.Account {
 	now := time.Now()
 	return &domain.Account{
-		TenantID:       r.TenantID,
+		TenantID:       tenantID,
 		Name:           r.Name,
 		InitialBalance: r.InitialBalance,
 		Color:          r.Color,
