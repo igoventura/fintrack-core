@@ -48,6 +48,7 @@ services:
       DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-fintrack}?sslmode=disable
       PORT: 8080
       SUPABASE_PROJECT_REF: ${SUPABASE_PROJECT_REF}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
 
 volumes:
   db_data:
