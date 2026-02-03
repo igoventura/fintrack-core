@@ -23,6 +23,7 @@ func NewAuthHandler(service service.AuthService) *AuthHandler {
 // @Accept  json
 // @Produce  json
 // @Param request body dto.RegisterRequest true "Register User"
+// @Param X-Tenant-ID header string false "Tenant ID"
 // @Success 201 {object} dto.AuthResponse
 // @Failure 400 {object} handler.ErrorResponse
 // @Router /auth/register [post]

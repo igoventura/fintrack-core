@@ -232,6 +232,10 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/dto.RegisterRequest'
+      - description: Tenant ID
+        in: header
+        name: X-Tenant-ID
+        type: string
       produces:
       - application/json
       responses:

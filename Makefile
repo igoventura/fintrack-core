@@ -43,6 +43,7 @@ test:
 swagger:
 	@echo "Generating Swagger documentation..."
 	@go run github.com/swaggo/swag/cmd/swag init -g cmd/api/main.go -o docs --ot yaml
+	@cp docs/swagger.yaml cmd/api/docs/swagger.yaml
 
 install-hooks:
 	@echo "Installing git hooks..."
