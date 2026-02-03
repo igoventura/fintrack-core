@@ -54,6 +54,7 @@ func main() {
 	// Initialize Repositories
 	accountRepo := postgres.NewAccountRepository(db)
 	userRepo := postgres.NewUserRepository(db)
+	tenantRepo := postgres.NewTenantRepository(db)
 
 	// Initialize Services
 	accountService := service.NewAccountService(accountRepo)
@@ -85,7 +86,7 @@ func main() {
 
 	// Create Middleware
 	authMiddleware := middleware.NewAuthMiddleware(userRepo, authValidator)
-	tenantMiddleware := middleware.NewTenantMiddleware()
+	tenantMiddleware := middleware.NewTenantMiddleware(tenantRepo)
 
 	// Router setup
 	r := router.NewRouter(accountHandler, authHandler, authMiddleware, tenantMiddleware)

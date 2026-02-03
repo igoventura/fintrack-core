@@ -16,18 +16,19 @@ This project follows **Clean Architecture** principles to ensure isolation of bu
 ├── internal/
 │   ├── api/                # Transport Layer (Adapters)
 │   │   ├── handler/        # HTTP Handlers (controllers)
-│   │   ├── middleware/     # Auth, Logging, CORS
+│   │   ├── middleware/     # Auth, Tenant, Logging, CORS
 │   │   ├── router/         # Route definitions and Scalar registration
 │   │   └── dto/            # Data Transfer Objects (Request/Response structs)
 │   ├── service/            # Use Cases (Business Logic)
 │   │   ├── account_service.go # Orchestrates entities and repos
+│   │   ├── auth_service.go    # Authentication logic (signup, login)
 │   │   └── user_service.go    # User management logic
 │   ├── db/                 # Persistence Layer (Adapters)
 │   │   └── postgres/       # SQL implementation using pgx
 │   │       ├── account_repository.go
 │   │       └── user_repository.go
 │   ├── config/             # Configuration loading (env vars, .yaml)
-│   └── auth/               # Identity Provider integration (Supabase)
+│   └── auth/               # Identity Provider integration (Supabase Validator)
 ├── docs/                   # Documentation
 │   └── swagger.yaml        # Auto-generated OpenAPI 3.0 specification
 ├── migrations/             # Database migrations
@@ -46,10 +47,16 @@ The center of the application. It contains entities and repository interfaces.
 ### 2. Service Layer (`/internal/service`)
 Contains the business logic (Use Cases). It acts as an orchestrator between the API layer and the Domain.
 - **Responsibility**: Orchestrates domain logic and implements business rules.
+- **Auth Service**: Manages user authentication flows (Sign Up, Login) and token handling via Supabase.
 - **Dependency**: Receives and returns **Domain Entities** (or primitives). It should NOT know about DTOs.
 - **Rule**: Pure business logic. No JSON tags, no validator tags, no web concerns.
 
-### 3. API Layer (`/internal/api`)
+### 3. Auth Package (`/internal/auth`)
+Provides the **Validator** for Supabase JWTs.
+- **Role**: Parses and verifies JWT tokens against the Supabase JWKS (JSON Web Key Set).
+- **Usage**: Used by `AuthMiddleware` to validate requests.
+
+### 4. API Layer (`/internal/api`)
 Handles all HTTP-specific logic using the **Gin** framework. 
 - **Handlers**: Act as a "Translator". They parse JSON into **DTOs** using Gin's binding, map those DTOs to **Domain Entities** to call the service, and map returned entities back to **Response DTOs**.
 - **DTOs**: Located in `/internal/api/dto`. These contain the JSON tags, validation rules (using Gin's default validator), and OpenAPI annotations.

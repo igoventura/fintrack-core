@@ -88,10 +88,18 @@ curl http://localhost:8080/health
 
 ## Authentication
 
-FinTrack Core uses **Supabase Authentication** for secure Google Sign-In.
+FinTrack Core uses **Supabase Authentication** for secure identity management.
 - **Identity Provider**: Supabase Auth (JWT).
+- **Validation**: Server-side JWT validation using the `internal/auth` package, which verifies tokens against Supabase's JWKS.
 - **Internal Mapping**: Users are linked via a `supabase_id` column in the `users` table.
-- **Middleware**: Bearer token validation is performed in the API layer via `AuthMiddleware`.
+- **Middleware**: `AuthMiddleware` extracts the Bearer token, validates it, and injects the user context into the request.
+
+## Multi-tenancy
+
+FinTrack Core supports multi-tenancy via request headers.
+- **Header**: `X-Tenant-ID`
+- **Middleware**: `TenantMiddleware` extracts the tenant ID from the header and injects it into the request context (`domain.WithTenantID`).
+- **Usage**: Services and Repositories extract the tenant ID from the context to filter data.
 
 ## Soft Delete Policy
 
