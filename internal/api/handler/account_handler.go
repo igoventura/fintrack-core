@@ -25,6 +25,7 @@ func NewAccountHandler(s *service.AccountService) *AccountHandler {
 // @Produce  json
 // @Param id path string true "Account ID"
 // @Param X-Tenant-ID header string true "Tenant ID"
+// @Security OAuth2Application
 // @Success 200 {object} dto.AccountResponse
 // @Failure 404 {object} handler.ErrorResponse
 // @Router /accounts/{id} [get]

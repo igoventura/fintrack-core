@@ -3,10 +3,10 @@ package router
 import (
 	"net/http"
 
+	"github.com/MarceloPetrucio/go-scalar-api-reference"
 	"github.com/gin-gonic/gin"
 	"github.com/igoventura/fintrack-core/internal/api/handler"
 	"github.com/igoventura/fintrack-core/internal/api/middleware"
-	"github.com/mvrilo/go-redoc"
 )
 
 func NewRouter(accountHandler *handler.AccountHandler, authMiddleware *middleware.AuthMiddleware, tenantMiddleware *middleware.TenantMiddleware) *gin.Engine {
@@ -27,19 +27,23 @@ func NewRouter(accountHandler *handler.AccountHandler, authMiddleware *middlewar
 	}
 
 	// Documentation
-	doc := redoc.Redoc{
-		Title:       "FinTrack API",
-		Description: "Financial tracking API documentation",
-		SpecFile:    "./docs/swagger.yaml",
-		SpecPath:    "/swagger.yaml",
-		DocsPath:    "/docs",
-	}
+	r.GET("/docs", func(c *gin.Context) {
+		htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
+			SpecURL: "./docs/swagger.yaml",
+			CustomOptions: scalar.CustomOptions{
+				PageTitle: "FinTrack API",
+			},
+			DarkMode: true,
+		})
+		if err != nil {
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+		c.Header("Content-Type", "text/html; charset=utf-8")
+		c.String(http.StatusOK, htmlContent)
+	})
 
-	// Convert redoc handler to gin compatible if needed,
-	// but Redoc.Handler() returns a standard http.Handler.
-	// We can use gin.WrapH to wrap it.
-	r.GET("/docs", gin.WrapH(doc.Handler()))
-	r.StaticFile("/swagger.yaml", "./docs/swagger.yaml")
+	r.StaticFile("swagger.yaml", "./docs/swagger.yaml")
 
 	return r
 }

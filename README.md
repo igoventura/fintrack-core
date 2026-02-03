@@ -68,11 +68,12 @@ Once running, the API is available at `http://localhost:8080`.
 go run cmd/api/main.go
 ```
 
-### Documentation (OpenAPI / Redoc)
+### Documentation (OpenAPI / Scalar)
 
 The API automatically serves interactive documentation generated from code annotations.
 
-- **Redoc UI**: [http://localhost:8080/docs](http://localhost:8080/docs)
+- **Redoc UI**: Replaced with **Scalar** for valid, interactive API documentation.
+- **Documentation URL**: [http://localhost:8080/docs](http://localhost:8080/docs)
 - **OpenAPI Spec**: [http://localhost:8080/swagger.yaml](http://localhost:8080/swagger.yaml)
 
 To update the documentation after changing code annotations, run:

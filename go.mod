@@ -3,13 +3,13 @@ module github.com/igoventura/fintrack-core
 go 1.25.6
 
 require (
+	github.com/MarceloPetrucio/go-scalar-api-reference v0.0.0-20240521013641-ce5d2efe0e06
 	github.com/MicahParks/keyfunc/v3 v3.7.0
 	github.com/gin-gonic/gin v1.11.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/jackc/tern/v2 v2.3.5
 	github.com/joho/godotenv v1.5.1
-	github.com/mvrilo/go-redoc v0.1.5
 	github.com/swaggo/swag v1.16.6
 )
 
