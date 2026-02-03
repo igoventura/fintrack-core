@@ -21,9 +21,11 @@ This project follows **Clean Architecture** principles to ensure isolation of bu
 │   │   └── dto/            # Data Transfer Objects (Request/Response structs)
 │   ├── service/            # Use Cases (Business Logic)
 │   │   ├── account_service.go # Orchestrates entities and repos
-│   │   └── user_service.go
+│   │   └── user_service.go    # User management logic
 │   ├── db/                 # Persistence Layer (Adapters)
 │   │   └── postgres/       # SQL implementation using pgx
+│   │       ├── account_repository.go
+│   │       └── user_repository.go
 │   ├── config/             # Configuration loading (env vars, .yaml)
 │   └── auth/               # Identity Provider integration (Supabase)
 ├── docs/                   # Documentation

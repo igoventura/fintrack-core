@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/igoventura/fintrack-core/domain"
 	"github.com/igoventura/fintrack-core/internal/api/dto"
 	"github.com/supabase-community/gotrue-go"
 	"github.com/supabase-community/gotrue-go/types"
@@ -14,12 +15,14 @@ type AuthService interface {
 }
 
 type SupabaseAuthService struct {
-	client gotrue.Client
+	client      gotrue.Client
+	userService *UserService
 }
 
-func NewSupabaseAuthService(projectID, apiKey string) *SupabaseAuthService {
+func NewSupabaseAuthService(projectID, apiKey string, userService *UserService) *SupabaseAuthService {
 	return &SupabaseAuthService{
-		client: gotrue.New(projectID, apiKey),
+		client:      gotrue.New(projectID, apiKey),
+		userService: userService,
 	}
 }
 
@@ -33,9 +36,21 @@ func (s *SupabaseAuthService) Register(ctx context.Context, email, password stri
 		return nil, err
 	}
 
-	// For signup, we might not get a session immediately if email confirmation is enabled.
-	// But assuming we get a user.
-	// If AccessToken is empty, it means confirmation is required.
+	user := &domain.User{
+		Email:      email,
+		SupabaseID: resp.User.ID.String(),
+		Name:       resp.User.UserMetadata["full_name"].(string),
+	}
+	if err := s.userService.CreateUser(ctx, user); err != nil {
+		return nil, err
+	}
+
+	if tenantID := domain.GetTenantID(ctx); tenantID != "" {
+		if err := s.userService.AddUserToTenant(ctx, user.ID, tenantID); err != nil {
+			return nil, err
+		}
+	}
+
 	return &dto.AuthResponse{
 		AccessToken:  resp.AccessToken,
 		RefreshToken: resp.RefreshToken,

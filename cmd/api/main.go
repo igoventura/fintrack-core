@@ -53,9 +53,11 @@ func main() {
 
 	// Initialize Repositories
 	accountRepo := postgres.NewAccountRepository(db)
+	userRepo := postgres.NewUserRepository(db)
 
 	// Initialize Services
 	accountService := service.NewAccountService(accountRepo)
+	userService := service.NewUserService(userRepo)
 
 	// Initialize Handlers
 	accountHandler := handler.NewAccountHandler(accountService)
@@ -78,11 +80,10 @@ func main() {
 	if anonKey == "" {
 		log.Fatal("SUPABASE_ANON_KEY environment variable is required")
 	}
-	authService := service.NewSupabaseAuthService(projectRef, anonKey)
+	authService := service.NewSupabaseAuthService(projectRef, anonKey, userService)
 	authHandler := handler.NewAuthHandler(authService)
 
-	// Create Repo and Middleware
-	userRepo := postgres.NewUserRepository(db)
+	// Create Middleware
 	authMiddleware := middleware.NewAuthMiddleware(userRepo, authValidator)
 	tenantMiddleware := middleware.NewTenantMiddleware()
 

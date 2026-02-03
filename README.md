@@ -100,6 +100,7 @@ FinTrack Core implements a comprehensive soft delete strategy to maintain data a
 - **Traceable Deletion**: Critical entities (`Accounts`, `Transactions`, `Attachments`) support full traceability by storing both the timestamp (`deactivated_at`) and the ID of the user who performed the action (`deactivated_by`).
 - **Standard Soft Delete**: Operational entities (`Users`, `Tenants`, `Tags`, `Categories`) use a standard `deactivated_at` timestamp.
 - **Join Table Policy**: Many-to-many associations like `Users <-> Tenants` are soft-deleted via timestamp, while lightweight associations like `Transactions <-> Tags` are hard-deleted if they lack specific audit requirements in the schema.
+- **Repository Pattern**: All "Read" operations (`Get`, `List`) automatically filter out soft-deleted records (`WHERE deactivated_at IS NULL`). "Delete" operations set the `deactivated_at` timestamp instead of removing the row.
 
 ### Environment Variables
 
