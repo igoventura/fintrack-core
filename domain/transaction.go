@@ -2,6 +2,8 @@ package domain
 
 import (
 	"context"
+	"errors"
+	"slices"
 	"time"
 )
 
@@ -75,4 +77,46 @@ type TransactionRepository interface {
 	AddAttachment(ctx context.Context, attachment *TransactionAttachment) error
 	RemoveAttachment(ctx context.Context, id string, userID string) error
 	ListAttachments(ctx context.Context, transactionID string) ([]TransactionAttachment, error)
+}
+
+func (t *Transaction) IsValid() (bool, map[string]error) {
+	err := make(map[string]error)
+	if t.TenantID == "" {
+		err["tenant_id"] = errors.New("tenant_id is required")
+	}
+	if t.FromAccountID == "" {
+		err["from_account_id"] = errors.New("from_account_id is required")
+	}
+	if t.Amount <= 0 {
+		err["amount"] = errors.New("amount must be greater than 0")
+	}
+	if t.TransactionType == "" {
+		err["transaction_type"] = errors.New("transaction_type is required")
+	} else {
+		validTypes := []TransactionType{TransactionTypeCredit, TransactionTypeDebit, TransactionTypeTransfer, TransactionTypePayment}
+		if !slices.Contains(validTypes, t.TransactionType) {
+			err["transaction_type"] = errors.New("invalid transaction type")
+		} else if t.TransactionType == TransactionTypeTransfer {
+			if t.ToAccountID == nil || *t.ToAccountID == "" {
+				err["to_account_id"] = errors.New("to_account_id is required for transfers")
+			}
+			if t.FromAccountID == *t.ToAccountID {
+				err["to_account_id"] = errors.New("to_account_id must be different from from_account_id")
+			}
+		}
+	}
+	if t.CategoryID == "" {
+		err["category_id"] = errors.New("category_id is required")
+	}
+	if len(t.AccrualMonth) != 6 {
+		// Simple length check for YYYYMM. Could be more robust with regex but good baseline.
+		err["accrual_month"] = errors.New("accrual_month must be in YYYYMM format")
+	}
+	if t.DueDate.IsZero() {
+		err["due_date"] = errors.New("due_date is required")
+	}
+	if len(err) == 0 {
+		return true, nil
+	}
+	return false, err
 }

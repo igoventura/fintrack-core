@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"time"
 )
 
@@ -23,4 +24,18 @@ type CategoryRepository interface {
 	Create(ctx context.Context, cat *Category) error
 	Update(ctx context.Context, cat *Category) error
 	Delete(ctx context.Context, id string) error
+}
+
+func (c *Category) IsValid() (bool, map[string]error) {
+	err := make(map[string]error)
+	if c.Name == "" {
+		err["name"] = errors.New("name is required")
+	}
+	if c.TenantID == "" {
+		err["tenant_id"] = errors.New("tenant_id is required")
+	}
+	if len(err) == 0 {
+		return true, nil
+	}
+	return false, err
 }

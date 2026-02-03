@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"errors"
+	"slices"
 	"time"
 )
 
@@ -81,4 +82,63 @@ type AccountRepository interface {
 
 	GetCreditCardInfo(ctx context.Context, accountID string) (*CreditCardInfo, error)
 	UpsertCreditCardInfo(ctx context.Context, info *CreditCardInfo) error
+}
+
+func (a *Account) IsValid() (bool, map[string]error) {
+	err := make(map[string]error)
+	if a.Name == "" {
+		err["name"] = errors.New("name is required")
+	}
+	if a.TenantID == "" {
+		err["tenant_id"] = errors.New("tenant_id is required")
+	}
+	if a.InitialBalance < 0 {
+		err["initial_balance"] = errors.New("initial_balance must be non-negative")
+	}
+	if a.Currency == "" {
+		err["currency"] = errors.New("currency is required")
+	}
+	if a.Type == "" {
+		err["type"] = errors.New("type is required")
+	} else {
+		validTypes := []AccountType{AccountTypeBank, AccountTypeCash, AccountTypeCreditCard, AccountTypeInvestment, AccountTypeOther}
+		if !slices.Contains(validTypes, a.Type) {
+			err["type"] = errors.New("invalid account type")
+		}
+	}
+	if len(err) == 0 {
+		return true, nil
+	}
+	return false, err
+}
+
+func (cci *CreditCardInfo) IsValid() (bool, map[string]error) {
+	err := make(map[string]error)
+	if cci.AccountID == "" {
+		err["account_id"] = errors.New("account_id is required")
+	}
+	if cci.LastFour == "" {
+		err["last_four"] = errors.New("last_four is required")
+	}
+	if cci.Name == "" {
+		err["name"] = errors.New("name is required")
+	}
+	if cci.Brand == "" {
+		err["brand"] = errors.New("brand is required")
+	} else {
+		validBrands := []CreditCardBrand{BrandVisa, BrandMastercard, BrandAmex, BrandDiscover, BrandJCB, BrandUnionpay, BrandDinersClub, BrandMaestro, BrandUnknown}
+		if !slices.Contains(validBrands, cci.Brand) {
+			err["brand"] = errors.New("invalid brand")
+		}
+	}
+	if cci.ClosingDate.IsZero() {
+		err["closing_date"] = errors.New("closing_date is required")
+	}
+	if cci.DueDate.IsZero() {
+		err["due_date"] = errors.New("due_date is required")
+	}
+	if len(err) == 0 {
+		return true, nil
+	}
+	return false, err
 }

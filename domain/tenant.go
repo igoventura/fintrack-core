@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"time"
 )
 
@@ -36,4 +37,15 @@ func WithTenantID(ctx context.Context, tenantID string) context.Context {
 func GetTenantID(ctx context.Context) string {
 	val, _ := ctx.Value(tenantIDKey).(string)
 	return val
+}
+
+func (t *Tenant) IsValid() (bool, map[string]error) {
+	err := make(map[string]error)
+	if t.Name == "" {
+		err["name"] = errors.New("name is required")
+	}
+	if len(err) == 0 {
+		return true, nil
+	}
+	return false, err
 }

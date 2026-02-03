@@ -2,6 +2,8 @@ package domain
 
 import (
 	"context"
+	"errors"
+	"regexp"
 	"time"
 )
 
@@ -48,4 +50,28 @@ func WithUserID(ctx context.Context, userID string) context.Context {
 
 func GetUserID(ctx context.Context) string {
 	return ctx.Value(userIdKey).(string)
+}
+
+func (u *User) IsValid() (bool, map[string]error) {
+	err := make(map[string]error)
+	if u.Name == "" {
+		err["name"] = errors.New("name is required")
+	}
+	if u.Email == "" {
+		err["email"] = errors.New("email is required")
+	} else {
+		// Basic email format validation
+		const emailRegexPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+		matched, _ := regexp.MatchString(emailRegexPattern, u.Email)
+		if !matched {
+			err["email"] = errors.New("invalid email format")
+		}
+	}
+	if u.SupabaseID == "" {
+		err["supabase_id"] = errors.New("supabase_id is required")
+	}
+	if len(err) == 0 {
+		return true, nil
+	}
+	return false, err
 }

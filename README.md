@@ -102,6 +102,10 @@ FinTrack Core implements a comprehensive soft delete strategy to maintain data a
 - **Join Table Policy**: Many-to-many associations like `Users <-> Tenants` are soft-deleted via timestamp, while lightweight associations like `Transactions <-> Tags` are hard-deleted if they lack specific audit requirements in the schema.
 - **Repository Pattern**: All "Read" operations (`Get`, `List`) automatically filter out soft-deleted records (`WHERE deactivated_at IS NULL`). "Delete" operations set the `deactivated_at` timestamp instead of removing the row.
 
+## Data Integrity
+
+The domain layer enforces business rules and data integrity through explicit `IsValid()` methods on all entities. This ensures that only valid data (e.g., non-negative balances, required fields, correct types) reaches the persistence layer.
+
 ### Environment Variables
 
 Create a `.env` file in your root directory:

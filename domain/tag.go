@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"time"
 )
 
@@ -20,4 +21,18 @@ type TagRepository interface {
 	Create(ctx context.Context, tag *Tag) error
 	Update(ctx context.Context, tag *Tag) error
 	Delete(ctx context.Context, id string) error
+}
+
+func (t *Tag) IsValid() (bool, map[string]error) {
+	err := make(map[string]error)
+	if t.Name == "" {
+		err["name"] = errors.New("name is required")
+	}
+	if t.TenantID == "" {
+		err["tenant_id"] = errors.New("tenant_id is required")
+	}
+	if len(err) == 0 {
+		return true, nil
+	}
+	return false, err
 }

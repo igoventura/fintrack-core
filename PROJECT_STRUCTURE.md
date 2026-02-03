@@ -41,6 +41,7 @@ This project follows **Clean Architecture** principles to ensure isolation of bu
 ### 1. Domain Layer (`/domain`)
 The center of the application. It contains entities and repository interfaces. 
 - **Rule**: This layer must **never** import anything from `internal`.
+- **Validation**: Domain entities allow for self-validation via `IsValid()` methods, ensuring data integrity before persistence.
 
 ### 2. Service Layer (`/internal/service`)
 Contains the business logic (Use Cases). It acts as an orchestrator between the API layer and the Domain.
