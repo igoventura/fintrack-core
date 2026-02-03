@@ -59,7 +59,7 @@ func (r *TenantRepository) Delete(ctx context.Context, id string) error {
 func (r *TenantRepository) ListByUserID(ctx context.Context, userID string) ([]domain.Tenant, error) {
 	query := `SELECT t.id, t.name, t.created_at, t.updated_at, t.deactivated_at
 			  FROM tenants t
-			  JOIN tenant_users tu ON t.id = tu.tenant_id
+			  JOIN users_tenants tu ON t.id = tu.tenant_id
 			  WHERE tu.user_id = $1 AND t.deactivated_at IS NULL`
 	rows, err := r.db.Pool.Query(ctx, query, userID)
 	if err != nil {

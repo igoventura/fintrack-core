@@ -65,7 +65,7 @@ func (s *UserService) DeleteUser(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *UserService) AddUserToTenant(ctx context.Context, userID, tenantID string) error {
+func (s *UserService) AddTenantToUser(ctx context.Context, userID, tenantID string) error {
 	if err := s.repo.AddUserToTenant(ctx, userID, tenantID); err != nil {
 		return fmt.Errorf("service failed to add user to tenant: %w", err)
 	}

@@ -63,6 +63,13 @@ definitions:
     - name
     - type
     type: object
+  dto.CreateTenantRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
   dto.RegisterRequest:
     properties:
       email:
@@ -76,6 +83,17 @@ definitions:
     - email
     - full_name
     - password
+    type: object
+  dto.TenantResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
     type: object
   dto.User:
     properties:
@@ -250,6 +268,38 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /tenants:
+    post:
+      consumes:
+      - application/json
+      description: Create a new tenant (workspace) and links the creator to it.
+      parameters:
+      - description: Create tenant
+        in: body
+        name: tenant
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTenantRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.TenantResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - AuthPassword: []
+      summary: Create a new tenant
+      tags:
+      - tenants
 securityDefinitions:
   AuthPassword:
     flow: password

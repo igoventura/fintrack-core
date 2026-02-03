@@ -20,6 +20,8 @@ We follow **Clean Architecture**.
     - Handles HTTP, Parsing, and Validation (Validation tags go here in DTOs).
     - Maps **DTO <-> Entity** explicitly (Mappers belong here).
     - Calls Service Layer.
+    - **Authentication**: Handlers behind `AuthMiddleware` can safely assume `domain.GetUserID(ctx)` returns a valid ID. Do not manually check for empty strings or 401s in handlers; let the middleware handle it.
+    - **Tenant ID**: Handlers behind `TenantMiddleware` can safely assume `domain.GetTenantID(ctx)` returns a valid ID. Do not manually check for empty strings or 401s in handlers; let the middleware handle it.  
 
 ## 2. Coding Standards
 

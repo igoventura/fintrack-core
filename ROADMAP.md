@@ -11,7 +11,7 @@ Core infrastructure and user management.
 - [ ] **Multi-Tenancy** (~80%)
   - [x] Tenant Middleware (Strict Validation)
   - [x] Tenant Repository
-  - [ ] API: Create Tenant Endpoint (Onboarding)
+  - [x] API: Create Tenant Endpoint (Onboarding)
 - [ ] **User Management** (~80%)
   - [x] User Repository
   - [x] Auth Service (Register/Login)

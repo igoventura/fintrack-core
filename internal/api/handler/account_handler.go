@@ -57,11 +57,6 @@ func (h *AccountHandler) Get(c *gin.Context) {
 // @Router /accounts [get]
 func (h *AccountHandler) List(c *gin.Context) {
 	tenantID := domain.GetTenantID(c.Request.Context())
-	if tenantID == "" {
-		ErrorJSON(c, http.StatusBadRequest, "tenant_id is required")
-		return
-	}
-
 	accounts, err := h.service.ListAccounts(c.Request.Context(), tenantID)
 	if err != nil {
 		ErrorJSON(c, http.StatusInternalServerError, "Failed to list accounts")
@@ -96,11 +91,6 @@ func (h *AccountHandler) Create(c *gin.Context) {
 	}
 
 	tenantID := domain.GetTenantID(c.Request.Context())
-	if tenantID == "" {
-		ErrorJSON(c, http.StatusBadRequest, "X-Tenant-ID header is required")
-		return
-	}
-
 	userId := domain.GetUserID(c.Request.Context())
 	if userId == "" {
 		ErrorJSON(c, http.StatusBadRequest, "User not found")

@@ -49,7 +49,7 @@ func (s *SupabaseAuthService) Register(ctx context.Context, email, password, ful
 	}
 
 	if tenantID := domain.GetTenantID(ctx); tenantID != "" {
-		if err := s.userService.AddUserToTenant(ctx, user.ID, tenantID); err != nil {
+		if err := s.userService.AddTenantToUser(ctx, user.ID, tenantID); err != nil {
 			return nil, err
 		}
 	}

@@ -9,6 +9,10 @@ import (
 	"github.com/igoventura/fintrack-core/internal/auth"
 )
 
+const (
+	UserIDKey = "userID"
+)
+
 type AuthMiddleware struct {
 	userRepo  domain.UserRepository
 	validator *auth.Validator
@@ -48,7 +52,9 @@ func (m *AuthMiddleware) Handle() gin.HandlerFunc {
 			return
 		}
 
-		domain.WithUserID(c.Request.Context(), user.ID)
+		c.Set(UserIDKey, user.ID)
+		ctx := domain.WithUserID(c.Request.Context(), user.ID)
+		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()
 	}

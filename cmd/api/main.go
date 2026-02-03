@@ -59,9 +59,11 @@ func main() {
 	// Initialize Services
 	accountService := service.NewAccountService(accountRepo)
 	userService := service.NewUserService(userRepo)
+	tenantService := service.NewTenantService(tenantRepo, userService)
 
 	// Initialize Handlers
 	accountHandler := handler.NewAccountHandler(accountService)
+	tenantHandler := handler.NewTenantHandler(tenantService)
 
 	// Auth Middleware
 	projectRef := os.Getenv("SUPABASE_PROJECT_REF")
@@ -89,7 +91,7 @@ func main() {
 	tenantMiddleware := middleware.NewTenantMiddleware(tenantRepo)
 
 	// Router setup
-	r := router.NewRouter(accountHandler, authHandler, authMiddleware, tenantMiddleware)
+	r := router.NewRouter(accountHandler, authHandler, tenantHandler, authMiddleware, tenantMiddleware)
 
 	// Server configuration
 	port := os.Getenv("PORT")
