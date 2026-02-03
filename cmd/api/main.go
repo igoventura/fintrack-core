@@ -56,27 +56,22 @@ func main() {
 	userRepo := postgres.NewUserRepository(db)
 	tenantRepo := postgres.NewTenantRepository(db)
 
-	// Initialize Services
-	accountService := service.NewAccountService(accountRepo)
-	userService := service.NewUserService(userRepo)
-	tenantService := service.NewTenantService(tenantRepo, userService)
-
-	// Initialize Handlers
-	accountHandler := handler.NewAccountHandler(accountService)
-	tenantHandler := handler.NewTenantHandler(tenantService)
-
-	// Auth Middleware
+	// Construct JWKS URL: https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json
 	projectRef := os.Getenv("SUPABASE_PROJECT_REF")
 	if projectRef == "" {
 		log.Fatal("SUPABASE_PROJECT_REF environment variable is required")
 	}
 
-	// Construct JWKS URL: https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json
 	jwksURL := "https://" + projectRef + ".supabase.co/auth/v1/.well-known/jwks.json"
 	authValidator, err := auth.NewValidator(jwksURL)
 	if err != nil {
 		log.Fatalf("Failed to initialize auth validator: %v", err)
 	}
+
+	// Initialize Services
+	accountService := service.NewAccountService(accountRepo)
+	userService := service.NewUserService(userRepo)
+	tenantService := service.NewTenantService(tenantRepo, userService)
 
 	// Auth Service (Supabase)
 	anonKey := os.Getenv("SUPABASE_ANON_KEY")
@@ -84,14 +79,19 @@ func main() {
 		log.Fatal("SUPABASE_ANON_KEY environment variable is required")
 	}
 	authService := service.NewSupabaseAuthService(projectRef, anonKey, userService)
+
+	// Initialize Handlers
+	accountHandler := handler.NewAccountHandler(accountService)
+	tenantHandler := handler.NewTenantHandler(tenantService)
 	authHandler := handler.NewAuthHandler(authService)
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	// Create Middleware
 	authMiddleware := middleware.NewAuthMiddleware(userRepo, authValidator)
 	tenantMiddleware := middleware.NewTenantMiddleware(tenantRepo)
 
 	// Router setup
-	r := router.NewRouter(accountHandler, authHandler, tenantHandler, authMiddleware, tenantMiddleware)
+	r := router.NewRouter(accountHandler, authHandler, tenantHandler, authMiddleware, tenantMiddleware, userHandler)
 
 	// Server configuration
 	port := os.Getenv("PORT")

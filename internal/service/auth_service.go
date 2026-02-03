@@ -79,3 +79,17 @@ func (s *SupabaseAuthService) Login(ctx context.Context, email, password string)
 		},
 	}, nil
 }
+
+func (s *SupabaseAuthService) UpdateUser(ctx context.Context, user *domain.User) error {
+	updateUserRequest := types.UpdateUserRequest{
+		Email: user.Email,
+		Data: map[string]any{
+			"full_name": user.Name,
+		},
+	}
+	if _, err := s.client.UpdateUser(updateUserRequest); err != nil {
+		return err
+	}
+
+	return nil
+}

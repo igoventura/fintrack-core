@@ -9,7 +9,7 @@ import (
 	"github.com/igoventura/fintrack-core/internal/api/middleware"
 )
 
-func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.AuthHandler, tenantHandler *handler.TenantHandler, authMiddleware *middleware.AuthMiddleware, tenantMiddleware *middleware.TenantMiddleware) *gin.Engine {
+func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.AuthHandler, tenantHandler *handler.TenantHandler, authMiddleware *middleware.AuthMiddleware, tenantMiddleware *middleware.TenantMiddleware, userHandler *handler.UserHandler) *gin.Engine {
 	r := gin.Default()
 
 	// Health check
@@ -39,6 +39,14 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 	{
 		auth.POST("/register", authHandler.Register)
 		auth.POST("/login", authHandler.Login)
+	}
+
+	// User routes
+	users := r.Group("/users")
+	users.Use(authMiddleware.Handle())
+	{
+		users.GET("/profile", userHandler.GetProfile)
+		users.PUT("/profile", userHandler.UpdateProfile)
 	}
 
 	// Documentation
