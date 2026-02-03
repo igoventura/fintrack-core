@@ -20,4 +20,5 @@ type TenantRepository interface {
 	Create(ctx context.Context, tenant *Tenant) error
 	Update(ctx context.Context, tenant *Tenant) error
 	Delete(ctx context.Context, id string) error
+	ListByUserID(ctx context.Context, userID string) ([]Tenant, error)
 }

@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"github.com/igoventura/fintrack-core/internal/api/handler"
+	"github.com/igoventura/fintrack-core/internal/api/middleware"
 	"github.com/igoventura/fintrack-core/internal/api/router"
+	"github.com/igoventura/fintrack-core/internal/auth"
 	"github.com/igoventura/fintrack-core/internal/db/postgres"
 	"github.com/igoventura/fintrack-core/internal/service"
 	"github.com/joho/godotenv"
@@ -56,8 +58,25 @@ func main() {
 	// Initialize Handlers
 	accountHandler := handler.NewAccountHandler(accountService)
 
+	// Auth Middleware
+	projectRef := os.Getenv("SUPABASE_PROJECT_REF")
+	if projectRef == "" {
+		log.Fatal("SUPABASE_PROJECT_REF environment variable is required")
+	}
+
+	// Construct JWKS URL: https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json
+	jwksURL := "https://" + projectRef + ".supabase.co/auth/v1/.well-known/jwks.json"
+	authValidator, err := auth.NewValidator(jwksURL)
+	if err != nil {
+		log.Fatalf("Failed to initialize auth validator: %v", err)
+	}
+
+	// Create Repo and Middleware
+	userRepo := postgres.NewUserRepository(db)
+	authMiddleware := middleware.NewAuthMiddleware(userRepo, authValidator)
+
 	// Router setup
-	r := router.NewRouter(accountHandler)
+	r := router.NewRouter(accountHandler, authMiddleware)
 
 	// Server configuration
 	port := os.Getenv("PORT")

@@ -54,3 +54,25 @@ func (r *TenantRepository) Delete(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+func (r *TenantRepository) ListByUserID(ctx context.Context, userID string) ([]domain.Tenant, error) {
+	query := `SELECT t.id, t.name, t.created_at, t.updated_at, t.deactivated_at
+			  FROM tenants t
+			  JOIN tenant_users tu ON t.id = tu.tenant_id
+			  WHERE tu.user_id = $1 AND t.deactivated_at IS NULL`
+	rows, err := r.db.Pool.Query(ctx, query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list tenants by user id: %w", err)
+	}
+	defer rows.Close()
+
+	var tenants []domain.Tenant
+	for rows.Next() {
+		var t domain.Tenant
+		if err := rows.Scan(&t.ID, &t.Name, &t.CreatedAt, &t.UpdatedAt, &t.DeactivatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan tenant: %w", err)
+		}
+		tenants = append(tenants, t)
+	}
+	return tenants, nil
+}

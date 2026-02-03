@@ -5,10 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/igoventura/fintrack-core/internal/api/handler"
+	"github.com/igoventura/fintrack-core/internal/api/middleware"
 	"github.com/mvrilo/go-redoc"
 )
 
-func NewRouter(accountHandler *handler.AccountHandler) *gin.Engine {
+func NewRouter(accountHandler *handler.AccountHandler, authMiddleware *middleware.AuthMiddleware) *gin.Engine {
 	r := gin.Default()
 
 	// Health check
@@ -18,6 +19,7 @@ func NewRouter(accountHandler *handler.AccountHandler) *gin.Engine {
 
 	// Account routes
 	accounts := r.Group("/accounts")
+	accounts.Use(authMiddleware.Handle())
 	{
 		accounts.GET("/", accountHandler.List)
 		accounts.POST("/", accountHandler.Create)

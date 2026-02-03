@@ -24,7 +24,8 @@ This project follows **Clean Architecture** principles to ensure isolation of bu
 │   │   └── user_service.go
 │   ├── db/                 # Persistence Layer (Adapters)
 │   │   └── postgres/       # SQL implementation using pgx
-│   └── config/             # Configuration loading (env vars, .yaml)
+│   ├── config/             # Configuration loading (env vars, .yaml)
+│   └── auth/               # Identity Provider integration (Supabase)
 ├── docs/                   # Documentation
 │   └── swagger.yaml        # Auto-generated OpenAPI 3.0 specification
 ├── migrations/             # Database migrations

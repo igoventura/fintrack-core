@@ -85,6 +85,13 @@ make swagger
 curl http://localhost:8080/health
 ```
 
+## Authentication
+
+FinTrack Core uses **Supabase Authentication** for secure Google Sign-In.
+- **Identity Provider**: Supabase Auth (JWT).
+- **Internal Mapping**: Users are linked via a `supabase_id` column in the `users` table.
+- **Middleware**: Bearer token validation is performed in the API layer via `AuthMiddleware`.
+
 ## Soft Delete Policy
 
 FinTrack Core implements a comprehensive soft delete strategy to maintain data auditability and prevent accidental data loss.
@@ -104,6 +111,7 @@ DB_PORT=5432
 DB_NAME=fintrack
 DB_USER=postgres
 DB_PASSWORD=postgres
+SUPABASE_PROJECT_REF=your_supabase_project_ref
 ```
 
 ## Testing

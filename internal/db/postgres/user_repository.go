@@ -16,10 +16,10 @@ func NewUserRepository(db *DB) *UserRepository {
 }
 
 func (r *UserRepository) GetByID(ctx context.Context, id string) (*domain.User, error) {
-	query := `SELECT id, name, email, created_at, updated_at, deactivated_at FROM users WHERE id = $1`
+	query := `SELECT id, supabase_id, name, email, created_at, updated_at, deactivated_at FROM users WHERE id = $1`
 	var u domain.User
 	err := r.db.Pool.QueryRow(ctx, query, id).Scan(
-		&u.ID, &u.Name, &u.Email, &u.CreatedAt, &u.UpdatedAt, &u.DeactivatedAt,
+		&u.ID, &u.SupabaseID, &u.Name, &u.Email, &u.CreatedAt, &u.UpdatedAt, &u.DeactivatedAt,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user by id: %w", err)
@@ -28,10 +28,10 @@ func (r *UserRepository) GetByID(ctx context.Context, id string) (*domain.User, 
 }
 
 func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
-	query := `SELECT id, name, email, created_at, updated_at, deactivated_at FROM users WHERE email = $1`
+	query := `SELECT id, supabase_id, name, email, created_at, updated_at, deactivated_at FROM users WHERE email = $1`
 	var u domain.User
 	err := r.db.Pool.QueryRow(ctx, query, email).Scan(
-		&u.ID, &u.Name, &u.Email, &u.CreatedAt, &u.UpdatedAt, &u.DeactivatedAt,
+		&u.ID, &u.SupabaseID, &u.Name, &u.Email, &u.CreatedAt, &u.UpdatedAt, &u.DeactivatedAt,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user by email: %w", err)
@@ -39,10 +39,22 @@ func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*domain.
 	return &u, nil
 }
 
+func (r *UserRepository) GetBySupabaseID(ctx context.Context, supabaseID string) (*domain.User, error) {
+	query := `SELECT id, supabase_id, name, email, created_at, updated_at, deactivated_at FROM users WHERE supabase_id = $1`
+	var u domain.User
+	err := r.db.Pool.QueryRow(ctx, query, supabaseID).Scan(
+		&u.ID, &u.SupabaseID, &u.Name, &u.Email, &u.CreatedAt, &u.UpdatedAt, &u.DeactivatedAt,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user by supabase id: %w", err)
+	}
+	return &u, nil
+}
+
 func (r *UserRepository) Create(ctx context.Context, u *domain.User) error {
-	query := `INSERT INTO users (id, name, email, created_at, updated_at, deactivated_at)
-			  VALUES ($1, $2, $3, $4, $5, $6)`
-	_, err := r.db.Pool.Exec(ctx, query, u.ID, u.Name, u.Email, u.CreatedAt, u.UpdatedAt, u.DeactivatedAt)
+	query := `INSERT INTO users (id, supabase_id, name, email, created_at, updated_at, deactivated_at)
+			  VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	_, err := r.db.Pool.Exec(ctx, query, u.ID, u.SupabaseID, u.Name, u.Email, u.CreatedAt, u.UpdatedAt, u.DeactivatedAt)
 	if err != nil {
 		return fmt.Errorf("failed to create user: %w", err)
 	}
