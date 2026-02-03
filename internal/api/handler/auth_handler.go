@@ -44,22 +44,25 @@ func (h *AuthHandler) Register(c *gin.Context) {
 
 // Login godoc
 // @Summary Login
-// @Description Login with email and password
+// @Description Login with username and password
 // @Tags auth
-// @Accept  json
+// @Accept  mpfd
 // @Produce  json
-// @Param request body dto.LoginRequest true "Login User"
+// @Param username formData string true "Username"
+// @Param password formData string true "Password"
 // @Success 200 {object} dto.AuthResponse
 // @Failure 400 {object} handler.ErrorResponse
 // @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
-	var req dto.LoginRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		ErrorJSON(c, http.StatusBadRequest, "Invalid request payload")
+	username := c.Request.FormValue("username")
+	password := c.Request.FormValue("password")
+
+	if username == "" || password == "" {
+		ErrorJSON(c, http.StatusBadRequest, "Username and password are required")
 		return
 	}
 
-	resp, err := h.service.Login(c.Request.Context(), req.Email, req.Password)
+	resp, err := h.service.Login(c.Request.Context(), username, password)
 	if err != nil {
 		ErrorJSON(c, http.StatusUnauthorized, "Invalid credentials")
 		return

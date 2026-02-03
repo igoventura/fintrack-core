@@ -66,16 +66,6 @@ definitions:
     - tenant_id
     - type
     type: object
-  dto.LoginRequest:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    required:
-    - email
-    - password
-    type: object
   dto.RegisterRequest:
     properties:
       email:
@@ -199,15 +189,19 @@ paths:
   /auth/login:
     post:
       consumes:
-      - application/json
-      description: Login with email and password
+      - multipart/form-data
+      description: Login with username and password
       parameters:
-      - description: Login User
-        in: body
-        name: request
+      - description: Username
+        in: formData
+        name: username
         required: true
-        schema:
-          $ref: '#/definitions/dto.LoginRequest'
+        type: string
+      - description: Password
+        in: formData
+        name: password
+        required: true
+        type: string
       produces:
       - application/json
       responses:
