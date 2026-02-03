@@ -9,7 +9,7 @@ import (
 	"github.com/mvrilo/go-redoc"
 )
 
-func NewRouter(accountHandler *handler.AccountHandler, authMiddleware *middleware.AuthMiddleware) *gin.Engine {
+func NewRouter(accountHandler *handler.AccountHandler, authMiddleware *middleware.AuthMiddleware, tenantMiddleware *middleware.TenantMiddleware) *gin.Engine {
 	r := gin.Default()
 
 	// Health check
@@ -19,7 +19,7 @@ func NewRouter(accountHandler *handler.AccountHandler, authMiddleware *middlewar
 
 	// Account routes
 	accounts := r.Group("/accounts")
-	accounts.Use(authMiddleware.Handle())
+	accounts.Use(authMiddleware.Handle(), tenantMiddleware.Handle())
 	{
 		accounts.GET("/", accountHandler.List)
 		accounts.POST("/", accountHandler.Create)

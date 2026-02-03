@@ -74,9 +74,10 @@ func main() {
 	// Create Repo and Middleware
 	userRepo := postgres.NewUserRepository(db)
 	authMiddleware := middleware.NewAuthMiddleware(userRepo, authValidator)
+	tenantMiddleware := middleware.NewTenantMiddleware()
 
 	// Router setup
-	r := router.NewRouter(accountHandler, authMiddleware)
+	r := router.NewRouter(accountHandler, authMiddleware, tenantMiddleware)
 
 	// Server configuration
 	port := os.Getenv("PORT")

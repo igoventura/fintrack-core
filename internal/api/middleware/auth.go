@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	UserContextKey = "currentUser"
+	UserIDKey = "userID"
 )
 
 type AuthMiddleware struct {
@@ -46,20 +46,15 @@ func (m *AuthMiddleware) Handle() gin.HandlerFunc {
 			return
 		}
 
-		// Check if user exists in DB by Supabase ID (sub claim)
 		user, err := m.userRepo.GetBySupabaseID(c.Request.Context(), claims.Subject)
 		if err != nil {
-			// If user doesn't exist, we might want to create it (Auto-provisioning)
-			// For now, let's assume strict checking, or we can implement auto-creation here if requested.
-			// Since we want to link users, if not found, it implies they haven't been synced or created yet.
-			// To be safe, we'll return Unauthorized if not found, or maybe Forbidden?
-			// But clean arch suggests maybe `Handle` shouldn't do complex creating logic?
-			// A simple approach: return 401 if user not found in our system.
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
 			return
 		}
 
-		c.Set(UserContextKey, user)
+		// Inject User ID
+		c.Set(UserIDKey, user.ID)
+
 		c.Next()
 	}
 }
