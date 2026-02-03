@@ -28,6 +28,7 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 
 	// Auth routes
 	auth := r.Group("/auth")
+	auth.Use(tenantMiddleware.Handle())
 	{
 		auth.POST("/register", authHandler.Register)
 		auth.POST("/login", authHandler.Login)
