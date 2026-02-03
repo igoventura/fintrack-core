@@ -96,9 +96,10 @@ FinTrack Core uses **Supabase Authentication** for secure identity management.
 
 ## Multi-tenancy
 
-FinTrack Core supports multi-tenancy via request headers.
-- **Header**: `X-Tenant-ID`
-- **Middleware**: `TenantMiddleware` extracts the tenant ID from the header and injects it into the request context (`domain.WithTenantID`).
+FinTrack Core supports strict multi-tenancy via request headers.
+- **Header**: `X-Tenant-ID` (Required)
+- **Validation**: `TenantMiddleware` validates the existence of the tenant in the database. Returns `401 Unauthorized` if invalid or missing.
+- **Context**: Successfully validated tenant IDs are injected into the request context (`domain.WithTenantID`).
 - **Usage**: Services and Repositories extract the tenant ID from the context to filter data.
 
 ## Soft Delete Policy
