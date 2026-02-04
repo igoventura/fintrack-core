@@ -15,10 +15,10 @@ func NewAccountRepository(db *DB) *AccountRepository {
 	return &AccountRepository{db: db}
 }
 
-func (r *AccountRepository) GetByID(ctx context.Context, id string) (*domain.Account, error) {
-	query := `SELECT id, tenant_id, name, initial_balance, color, currency, icon, type, created_at, created_by, updated_at, updated_by, deactivated_at, deactivated_by FROM accounts WHERE id = $1 AND deactivated_at IS NULL`
+func (r *AccountRepository) GetByID(ctx context.Context, id, tenantID string) (*domain.Account, error) {
+	query := `SELECT id, tenant_id, name, initial_balance, color, currency, icon, type, created_at, created_by, updated_at, updated_by, deactivated_at, deactivated_by FROM accounts WHERE id = $1 AND tenant_id = $2 AND deactivated_at IS NULL`
 	var a domain.Account
-	err := r.db.Pool.QueryRow(ctx, query, id).Scan(
+	err := r.db.Pool.QueryRow(ctx, query, id, tenantID).Scan(
 		&a.ID, &a.TenantID, &a.Name, &a.InitialBalance, &a.Color, &a.Currency, &a.Icon, &a.Type, &a.CreatedAt, &a.CreatedBy, &a.UpdatedAt, &a.UpdatedBy, &a.DeactivatedAt, &a.DeactivatedBy,
 	)
 	if err != nil {
@@ -66,9 +66,9 @@ func (r *AccountRepository) Update(ctx context.Context, a *domain.Account) error
 	return nil
 }
 
-func (r *AccountRepository) Delete(ctx context.Context, id string, userID string) error {
-	query := `UPDATE accounts SET deactivated_at = CURRENT_TIMESTAMP, deactivated_by = $2 WHERE id = $1`
-	_, err := r.db.Pool.Exec(ctx, query, id, userID)
+func (r *AccountRepository) Delete(ctx context.Context, id, tenantID, userID string) error {
+	query := `UPDATE accounts SET deactivated_at = CURRENT_TIMESTAMP, deactivated_by = $2 WHERE id = $1 AND tenant_id = $3`
+	_, err := r.db.Pool.Exec(ctx, query, id, userID, tenantID)
 	if err != nil {
 		return fmt.Errorf("failed to delete account: %w", err)
 	}

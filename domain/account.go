@@ -74,11 +74,11 @@ type CreditCardInfo struct {
 
 // AccountRepository defines the interface for account persistence.
 type AccountRepository interface {
-	GetByID(ctx context.Context, id string) (*Account, error)
+	GetByID(ctx context.Context, id, tenantID string) (*Account, error)
 	List(ctx context.Context, tenantID string) ([]Account, error)
 	Create(ctx context.Context, acc *Account) error
 	Update(ctx context.Context, acc *Account) error
-	Delete(ctx context.Context, id string, userID string) error
+	Delete(ctx context.Context, id, tenantID, userID string) error
 
 	GetCreditCardInfo(ctx context.Context, accountID string) (*CreditCardInfo, error)
 	UpsertCreditCardInfo(ctx context.Context, info *CreditCardInfo) error

@@ -25,7 +25,7 @@ Organizing financial data.
 - [ ] **Categories** (authenticated endpoint and tenant-scoped)
   - [x] Repository
   - [x] Service Layer (Business Logic)
-  - [ ] API Handlers & Routes
+  - [x] API Handlers & Routes
   - [ ] Integration Tests
 
 - [ ] **Tags** (authenticated endpoint and tenant-scoped)

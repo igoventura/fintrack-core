@@ -19,12 +19,23 @@ This project follows **Clean Architecture** principles to ensure isolation of bu
 ├── internal/
 │   ├── api/                # Transport Layer (Adapters)
 │   │   ├── handler/        # HTTP Handlers (controllers)
+│   │   │   ├── account_handler.go
+│   │   │   ├── auth_handler.go
+│   │   │   ├── category_handler.go
+│   │   │   ├── tenant_handler.go
+│   │   │   └── user_handler.go
 │   │   ├── middleware/     # Auth, Tenant, Logging, CORS
 │   │   ├── router/         # Route definitions and Scalar registration
 │   │   └── dto/            # Data Transfer Objects (Request/Response structs)
+│   │       ├── account_dto.go
+│   │       ├── auth_dto.go
+│   │       ├── category_dto.go
+│   │       ├── tenant_dto.go
+│   │       └── user_dto.go
 │   ├── service/            # Use Cases (Business Logic)
 │   │   ├── account_service.go
 │   │   ├── auth_service.go
+│   │   ├── category_service.go
 │   │   ├── tenant_service.go
 │   │   └── user_service.go
 │   ├── db/                 # Persistence Layer (Adapters)

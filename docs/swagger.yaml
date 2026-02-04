@@ -45,6 +45,29 @@ definitions:
       user:
         $ref: '#/definitions/dto.User'
     type: object
+  dto.CategoryResponse:
+    properties:
+      color:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      icon:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      parent_category_id:
+        type: string
+      tenant_id:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
   dto.CreateAccountRequest:
     properties:
       color:
@@ -62,6 +85,19 @@ definitions:
     required:
     - name
     - type
+    type: object
+  dto.CreateCategoryRequest:
+    properties:
+      color:
+        type: string
+      icon:
+        type: string
+      name:
+        type: string
+      parent_category_id:
+        type: string
+    required:
+    - name
     type: object
   dto.CreateTenantRequest:
     properties:
@@ -94,6 +130,19 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  dto.UpdateCategoryRequest:
+    properties:
+      color:
+        type: string
+      icon:
+        type: string
+      name:
+        type: string
+      parent_category_id:
+        type: string
+    required:
+    - name
     type: object
   dto.UpdateUserRequest:
     properties:
@@ -298,6 +347,167 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /categories:
+    get:
+      description: Get all categories for the authenticated user's tenant
+      parameters:
+      - description: Tenant ID
+        in: header
+        name: X-Tenant-ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.CategoryResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - AuthPassword: []
+      summary: List categories
+      tags:
+      - categories
+    post:
+      consumes:
+      - application/json
+      description: Create a new category for the authenticated user's tenant
+      parameters:
+      - description: Tenant ID
+        in: header
+        name: X-Tenant-ID
+        required: true
+        type: string
+      - description: Create Category Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CategoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - AuthPassword: []
+      summary: Create category
+      tags:
+      - categories
+  /categories/{id}:
+    delete:
+      description: Soft Delete a category
+      parameters:
+      - description: Tenant ID
+        in: header
+        name: X-Tenant-ID
+        required: true
+        type: string
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - AuthPassword: []
+      summary: Delete category
+      tags:
+      - categories
+    get:
+      description: Get a category by its ID
+      parameters:
+      - description: Tenant ID
+        in: header
+        name: X-Tenant-ID
+        required: true
+        type: string
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CategoryResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - AuthPassword: []
+      summary: Get category
+      tags:
+      - categories
+    put:
+      consumes:
+      - application/json
+      description: Update an existing category
+      parameters:
+      - description: Tenant ID
+        in: header
+        name: X-Tenant-ID
+        required: true
+        type: string
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Category Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CategoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - AuthPassword: []
+      summary: Update category
+      tags:
+      - categories
   /tenants:
     post:
       consumes:

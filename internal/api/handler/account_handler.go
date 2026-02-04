@@ -56,8 +56,7 @@ func (h *AccountHandler) Get(c *gin.Context) {
 // @Failure 400 {object} handler.ErrorResponse
 // @Router /accounts [get]
 func (h *AccountHandler) List(c *gin.Context) {
-	tenantID := domain.GetTenantID(c.Request.Context())
-	accounts, err := h.service.ListAccounts(c.Request.Context(), tenantID)
+	accounts, err := h.service.ListAccounts(c.Request.Context())
 	if err != nil {
 		ErrorJSON(c, http.StatusInternalServerError, "Failed to list accounts")
 		return

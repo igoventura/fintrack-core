@@ -9,7 +9,7 @@ import (
 	"github.com/igoventura/fintrack-core/internal/api/middleware"
 )
 
-func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.AuthHandler, tenantHandler *handler.TenantHandler, authMiddleware *middleware.AuthMiddleware, tenantMiddleware *middleware.TenantMiddleware, userHandler *handler.UserHandler) *gin.Engine {
+func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.AuthHandler, categoryHandler *handler.CategoryHandler, tenantHandler *handler.TenantHandler, authMiddleware *middleware.AuthMiddleware, tenantMiddleware *middleware.TenantMiddleware, userHandler *handler.UserHandler) *gin.Engine {
 	r := gin.Default()
 
 	// Health check
@@ -31,6 +31,17 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 		accounts.GET("/", accountHandler.List)
 		accounts.POST("/", accountHandler.Create)
 		accounts.GET("/:id", accountHandler.Get)
+	}
+
+	// Category routes
+	categories := r.Group("/categories")
+	categories.Use(authMiddleware.Handle(), tenantMiddleware.Handle())
+	{
+		categories.GET("/", categoryHandler.ListCategories)
+		categories.POST("/", categoryHandler.CreateCategory)
+		categories.GET("/:id", categoryHandler.GetCategory)
+		categories.PUT("/:id", categoryHandler.UpdateCategory)
+		categories.DELETE("/:id", categoryHandler.DeleteCategory)
 	}
 
 	// Auth routes
