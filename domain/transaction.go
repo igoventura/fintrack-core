@@ -73,10 +73,11 @@ type TransactionRepository interface {
 	List(ctx context.Context, tenantID string, filter TransactionFilter) ([]Transaction, error)
 	Create(ctx context.Context, tx *Transaction) error
 	Update(ctx context.Context, tx *Transaction) error
-	Delete(ctx context.Context, tenantID, id string, userID string) error
+	Delete(ctx context.Context, tenantID, id, userID string) error
 
 	// Tag associations
 	AddTagsToTransaction(ctx context.Context, transactionID string, tagIDs []string) error
+	ReplaceTags(ctx context.Context, transactionID string, tagIDs []string) error
 	RemoveTagFromTransaction(ctx context.Context, transactionID, tagID string) error
 	ListTransactionTags(ctx context.Context, transactionID string) ([]Tag, error)
 

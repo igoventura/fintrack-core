@@ -9,7 +9,7 @@ import (
 	"github.com/igoventura/fintrack-api/internal/api/middleware"
 )
 
-func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.AuthHandler, categoryHandler *handler.CategoryHandler, tagHandler *handler.TagHandler, tenantHandler *handler.TenantHandler, authMiddleware *middleware.AuthMiddleware, tenantMiddleware *middleware.TenantMiddleware, userHandler *handler.UserHandler) *gin.Engine {
+func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.AuthHandler, categoryHandler *handler.CategoryHandler, tagHandler *handler.TagHandler, tenantHandler *handler.TenantHandler, transactionHandler *handler.TransactionHandler, authMiddleware *middleware.AuthMiddleware, tenantMiddleware *middleware.TenantMiddleware, userHandler *handler.UserHandler) *gin.Engine {
 	r := gin.Default()
 
 	// Health check
@@ -26,7 +26,7 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 
 	// Account routes
 	accounts := r.Group("/accounts")
-	accounts.Use(authMiddleware.Handle(), tenantMiddleware.Handle())
+	accounts.Use(authMiddleware.Handle(), tenantMiddleware.Handle(false))
 	{
 		accounts.GET("/", accountHandler.List)
 		accounts.POST("/", accountHandler.Create)
@@ -35,7 +35,7 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 
 	// Category routes
 	categories := r.Group("/categories")
-	categories.Use(authMiddleware.Handle(), tenantMiddleware.Handle())
+	categories.Use(authMiddleware.Handle(), tenantMiddleware.Handle(false))
 	{
 		categories.GET("/", categoryHandler.ListCategories)
 		categories.POST("/", categoryHandler.CreateCategory)
@@ -46,7 +46,7 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 
 	// Tag routes
 	tags := r.Group("/tags")
-	tags.Use(authMiddleware.Handle(), tenantMiddleware.Handle())
+	tags.Use(authMiddleware.Handle(), tenantMiddleware.Handle(false))
 	{
 		tags.GET("/", tagHandler.ListTags)
 		tags.POST("/", tagHandler.CreateTag)
@@ -55,9 +55,20 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 		tags.DELETE("/:id", tagHandler.DeleteTag)
 	}
 
+	// Transaction routes
+	transactions := r.Group("/transactions")
+	transactions.Use(authMiddleware.Handle(), tenantMiddleware.Handle(false))
+	{
+		transactions.GET("/", transactionHandler.List)
+		transactions.POST("/", transactionHandler.Create)
+		transactions.GET("/:id", transactionHandler.GetByID)
+		transactions.PUT("/:id", transactionHandler.Update)
+		transactions.DELETE("/:id", transactionHandler.Delete)
+	}
+
 	// Auth routes
 	auth := r.Group("/auth")
-	auth.Use(tenantMiddleware.Handle())
+	auth.Use(tenantMiddleware.Handle(true))
 	{
 		auth.POST("/register", authHandler.Register)
 		auth.POST("/login", authHandler.Login)

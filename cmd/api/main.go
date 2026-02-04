@@ -57,6 +57,7 @@ func main() {
 	tagRepo := postgres.NewTagRepository(db)
 	userRepo := postgres.NewUserRepository(db)
 	tenantRepo := postgres.NewTenantRepository(db)
+	transactionRepo := postgres.NewTransactionRepository(db)
 
 	// Construct JWKS URL: https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json
 	projectRef := os.Getenv("SUPABASE_PROJECT_REF")
@@ -74,6 +75,7 @@ func main() {
 	accountService := service.NewAccountService(accountRepo)
 	categoryService := service.NewCategoryService(categoryRepo)
 	tagService := service.NewTagService(tagRepo)
+	transactionService := service.NewTransactionService(transactionRepo, accountRepo, categoryRepo, tagRepo)
 	userService := service.NewUserService(userRepo)
 	tenantService := service.NewTenantService(tenantRepo, userService)
 
@@ -88,6 +90,7 @@ func main() {
 	accountHandler := handler.NewAccountHandler(accountService)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 	tagHandler := handler.NewTagHandler(tagService)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 	tenantHandler := handler.NewTenantHandler(tenantService)
 	authHandler := handler.NewAuthHandler(authService)
 	userHandler := handler.NewUserHandler(userService, authService)
@@ -97,7 +100,7 @@ func main() {
 	tenantMiddleware := middleware.NewTenantMiddleware(tenantRepo)
 
 	// Router setup
-	r := router.NewRouter(accountHandler, authHandler, categoryHandler, tagHandler, tenantHandler, authMiddleware, tenantMiddleware, userHandler)
+	r := router.NewRouter(accountHandler, authHandler, categoryHandler, tagHandler, tenantHandler, transactionHandler, authMiddleware, tenantMiddleware, userHandler)
 
 	// Server configuration
 	port := os.Getenv("PORT")

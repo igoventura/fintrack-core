@@ -75,3 +75,16 @@ func (r *TagRepository) Delete(ctx context.Context, id, tenantID, userID string)
 	}
 	return nil
 }
+func (r *TagRepository) ValidateTags(ctx context.Context, tenantID string, tagIDs []string) (bool, error) {
+	if len(tagIDs) == 0 {
+		return true, nil
+	}
+	query := `SELECT COUNT(*) FROM tags WHERE tenant_id = $1 AND id = ANY($2) AND deactivated_at IS NULL`
+	var count int
+	err := r.db.Pool.QueryRow(ctx, query, tenantID, tagIDs).Scan(&count)
+	if err != nil {
+		return false, fmt.Errorf("failed to validate tags: %w", err)
+	}
+
+	return count == len(tagIDs), nil
+}

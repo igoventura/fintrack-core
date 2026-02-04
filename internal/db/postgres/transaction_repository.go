@@ -38,9 +38,7 @@ func (r *TransactionRepository) List(ctx context.Context, tenantID string, filte
 		argIdx++
 	}
 	if filter.AccountID != "" {
-		// Filter both from_account and to_account? Or just from?
-		// Usually "Account X transactions" means involved in either.
-		query += fmt.Sprintf(" AND (from_account_id = $%d OR to_account_id = $%d)", argIdx, argIdx)
+		query += fmt.Sprintf(" AND from_account_id = $%d", argIdx)
 		args = append(args, filter.AccountID)
 		argIdx++
 	}
@@ -114,6 +112,41 @@ func (r *TransactionRepository) AddTagsToTransaction(ctx context.Context, transa
 	_, err := r.db.Pool.Exec(ctx, query, values...)
 	if err != nil {
 		return fmt.Errorf("failed to add tags to transaction: %w", err)
+	}
+	return nil
+}
+
+func (r *TransactionRepository) ReplaceTags(ctx context.Context, transactionID string, tagIDs []string) error {
+	tx, err := r.db.Pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback(ctx)
+
+	// 1. Delete existing tags
+	deleteQuery := `DELETE FROM transactions_tags WHERE transaction_id = $1`
+	if _, err := tx.Exec(ctx, deleteQuery, transactionID); err != nil {
+		return fmt.Errorf("failed to delete existing tags: %w", err)
+	}
+
+	// 2. Insert new tags (if any)
+	if len(tagIDs) > 0 {
+		insertQuery := `INSERT INTO transactions_tags (transaction_id, tag_id) VALUES `
+		values := []interface{}{}
+		for i, tagID := range tagIDs {
+			n := i * 2
+			insertQuery += fmt.Sprintf("($%d, $%d),", n+1, n+2)
+			values = append(values, transactionID, tagID)
+		}
+		insertQuery = insertQuery[:len(insertQuery)-1] // Remove trailing comma
+
+		if _, err := tx.Exec(ctx, insertQuery, values...); err != nil {
+			return fmt.Errorf("failed to insert new tags: %w", err)
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 	return nil
 }

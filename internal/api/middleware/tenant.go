@@ -19,7 +19,7 @@ func NewTenantMiddleware(tenantRepo domain.TenantRepository) *TenantMiddleware {
 	return &TenantMiddleware{tenantRepo: tenantRepo}
 }
 
-func (m *TenantMiddleware) Handle() gin.HandlerFunc {
+func (m *TenantMiddleware) Handle(skipValidation bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tenantID := c.GetHeader(TenantIDHeader)
 		if tenantID != "" {
@@ -29,7 +29,7 @@ func (m *TenantMiddleware) Handle() gin.HandlerFunc {
 			}
 			ctx := domain.WithTenantID(c.Request.Context(), tenantID)
 			c.Request = c.Request.WithContext(ctx)
-		} else {
+		} else if !skipValidation {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant ID is required"})
 			return
 		}

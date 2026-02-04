@@ -50,11 +50,11 @@ The heart of the application: tracking money movement.
           - [x] Default currency logic (from Account).
           - [x] Tag association (list of IDs).
           - [x] Basic validation.
-  - [ ] API Layer
-      - [ ] Create DTOs.
-      - [ ] Implement `TransactionHandler`.
-      - [ ] Register Routes.
-  - [ ] Link to Categories and Tags
+  - [x] API Layer
+      - [x] Create DTOs.
+      - [x] Implement `TransactionHandler`.
+      - [x] Register Routes.
+  - [x] Link to Categories and Tags
   - [ ] **Transaction Logic Rules**:
     - [ ] **Fields**:
       - `FromAccountID`: Source account.

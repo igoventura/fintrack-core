@@ -65,7 +65,10 @@ Follow this order when implementing a new feature (e.g., "Add Expense"):
 ### Tenant Isolation Protocol
 *   **Repository Layer**: ALL methods (Get, List, Update, Delete) MUST accept `tenantID` as an argument and filter by `tenant_id = $x` in the SQL query.
     *   *Exception*: Global lookups (if any) or user-scoped queries that are not tenant-bound.
-*   **Service Layer**: Retrieve `tenantID` from `domain.GetTenantID(ctx)` and pass it to the Repository. Do not accept `tenantID` as a function argument from the Handler (unless it's a specific requirement).
+*   **Service Layer**: Retrieve `tenantID` from `domain.GetTenantID(ctx)` and pass it to the Repository.
+    *   **NO Manual Validation**: Do NOT check if `tenantID` is empty. The `TenantMiddleware` guarantees it is present.
+    *   **Related Entities**: When linking other entities (e.g., Accounts, Categories, Tags), **ALWAYS** validate that they belong to the same `tenantID`.
+    *   **Do not** accept `tenantID` as a function argument from the Handler (unless it's a specific requirement).
 
 ---
 

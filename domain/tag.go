@@ -26,6 +26,7 @@ type TagRepository interface {
 	Create(ctx context.Context, tag *Tag) error
 	Update(ctx context.Context, tag *Tag) error
 	Delete(ctx context.Context, id, tenantID, userID string) error
+	ValidateTags(ctx context.Context, tenantID string, tagIDs []string) (bool, error)
 }
 
 func (t *Tag) IsValid() (bool, map[string]error) {
