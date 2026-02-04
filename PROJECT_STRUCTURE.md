@@ -54,12 +54,7 @@ This project follows **Clean Architecture** principles to ensure isolation of bu
 │   └── auth/               # Identity Provider integration (Supabase Validator)
 ├── docs/                   # Documentation
 │   └── swagger.yaml        # Auto-generated OpenAPI 3.0 specification
-├── fern/                   # Fern API definition & configuration
-│   ├── fern.config.json
-│   ├── generators.yml
-│   └── docs.yml
 ├── migrations/             # Database migrations
-├── sdks/                   # Generated Client SDKs (TypeScrpt, Go, etc.)
 └── Makefile                # Automation commands
 ```
 

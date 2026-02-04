@@ -1,9 +1,0 @@
-instances:
-  - url: https://fintrack.docs.buildwithfern.com
-title: Fintrack | Documentation
-navigation:
-  - api: API Reference
-    paginated: true
-colors:
-  accentPrimary: '#ffffff'
-  background: '#000000'

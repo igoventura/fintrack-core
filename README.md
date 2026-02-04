@@ -33,11 +33,6 @@ make tidy           # Run go mod tidy
 make test           # Run all tests
 make swagger        # Regenerate OpenAPI documentation using swag
 make install-hooks  # Install git pre-commit hooks
-
-# SDKs & Documentation (Fern)
-make install-fern       # Install Fern CLI
-make fern-generate-sdks # Generate Client SDKs
-make fern-generate-docs # Generate Documentation site
 ```
 
 ## Migrations
@@ -106,17 +101,6 @@ FinTrack Core supports strict multi-tenancy via request headers.
 - **Validation**: `TenantMiddleware` validates the existence of the tenant in the database. Returns `401 Unauthorized` if invalid or missing.
 - **Context**: Successfully validated tenant IDs are injected into the request context (`domain.WithTenantID`).
 - **Usage**: Services and Repositories extract the tenant ID from the context to filter data.
-
-## SDK Generation (Fern)
-
-FinTrack Core uses **Fern** to automatically generate client SDKs (TypeScript, Python, Go, etc.) and API documentation.
-
-- **Configuration**: Located in `fern/`.
-- **Output**: SDKs are generated into the `sdks/` directory (gitignored).
-- **Commands**:
-  ```bash
-  make fern-generate-sdks
-  ```
 
 ## Soft Delete Policy
 

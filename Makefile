@@ -4,7 +4,7 @@ ifneq (,$(wildcard ./.env))
     export
 endif
 
-.PHONY: migrate rollback new-migration tidy test help compose fern-generate-sdks fern-generate-docs install-fern
+.PHONY: migrate rollback new-migration tidy test help compose
 
 help:
 	@echo "Available commands:"
@@ -50,16 +50,3 @@ install-hooks:
 	@chmod +x scripts/pre-commit
 	@ln -sf ../../scripts/pre-commit .git/hooks/pre-commit
 	@echo "Hooks installed successfully!"
-
-install-fern:
-	@echo "Installing fern..."
-	@npm install -g fern-api
-	@npx fern-api login
-
-fern-generate-sdks:
-	@echo "Generating Fern API..."
-	@npx fern-api generate --local
-
-fern-generate-docs:
-	@echo "Generating Fern API..."
-	@npx fern-api generate --docs --local
