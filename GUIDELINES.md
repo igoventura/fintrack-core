@@ -60,7 +60,12 @@ Follow this order when implementing a new feature (e.g., "Add Expense"):
 *   **Context**:
     *   **Authentication**: Use `domain.GetUserID(ctx)` to get the authenticated User ID.
     *   **Multi-Tenancy**: Use `domain.GetTenantID(ctx)` to get the Tenant ID.
-    *   *Note*: The middleware guarantees these are present; no need for defensive checks in handlers.
+    *   *Note*: The middleware filters requests without valid Tenant IDs, so handlers/services can assume it exists. Do NOT manually check for empty ID.
+
+### Tenant Isolation Protocol
+*   **Repository Layer**: ALL methods (Get, List, Update, Delete) MUST accept `tenantID` as an argument and filter by `tenant_id = $x` in the SQL query.
+    *   *Exception*: Global lookups (if any) or user-scoped queries that are not tenant-bound.
+*   **Service Layer**: Retrieve `tenantID` from `domain.GetTenantID(ctx)` and pass it to the Repository. Do not accept `tenantID` as a function argument from the Handler (unless it's a specific requirement).
 
 ---
 
