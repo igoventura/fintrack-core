@@ -40,16 +40,16 @@ The heart of the application: tracking money movement.
       - [x] Add `currency` column to `transactions` table.
       - [x] Remove `previous_sibling_transaction_id` and `next_sibling_transaction_id`.
       - [x] Add `parent_transaction_id` column for splitting transactions.
-      - [x] Add `created_at`, `updated_at`, `deactivated_at` to `transactions_tags` table.
+      - [x] Add `parent_transaction_id` column for splitting transactions.
+      - [x] Refactor `transactions_tags`: Removed audit columns (simple join table).
   - [x] Domain & Repository
       - [x] Update `Transaction` entity.
       - [x] Update `TransactionRepository` (CRUD + Filters).
-      - [x] Update `TransactionRepository` for bulk tag insertion (`AddTagsToTransaction`).
+      - [x] Update `TransactionRepository` for bulk tag insertion (`AddTagsToTransaction` & `ReplaceTags`).
   - [x] Service Layer
-      - [x] Implement `CreateTransaction` with:
-          - [x] Default currency logic (from Account).
-          - [x] Tag association (list of IDs).
-          - [x] Basic validation.
+      - [x] Implement `CreateTransaction` with default currency and tag association.
+      - [x] Implement `UpdateTransaction` with Tag Replacement (Upsert) logic.
+      - [x] Basic validation (Tenant Isolation).
   - [x] API Layer
       - [x] Create DTOs.
       - [x] Implement `TransactionHandler`.
@@ -67,12 +67,6 @@ The heart of the application: tracking money movement.
       - Logic: Splits value, generates N transactions.
       - Rounding: First installment absorbs remainder (e.g. 10/3 -> 3.34, 3.33, 3.33). Sum must match Amount.
       - Due Dates: Calculated based on accrual month + 1 month. Handles month-end logic (31st -> 28th/29th).
-
-- [ ] **Attachments** (authenticated endpoint and tenant-scoped)
-  - [x] Schema Support
-  - [ ] File Upload Logic (Service)
-  - [ ] Storage Provider Integration (e.g. S3/Supabase Storage) - *Pending Design*
-  - [ ] API Handlers
 
 ## Phase 4: Extensions
 Advanced features.
@@ -92,6 +86,12 @@ Advanced features.
     - id, inviter_user_id, email, tenant_id, status, expires_at, created_at, updated_at
   - [ ] Domain & Repository
   - [ ] Service (Send, Accept, Revoke logic)
+  - [ ] API Handlers
+
+- [ ] **Transaction Attachments** (authenticated endpoint and tenant-scoped)
+  - [x] Schema Support
+  - [ ] File Upload Logic (Service)
+  - [ ] Storage Provider Integration (e.g. S3/Supabase Storage) - *Pending Design*
   - [ ] API Handlers
 
 ## Infrastructure & Quality
