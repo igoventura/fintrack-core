@@ -72,6 +72,7 @@ type TransactionRepository interface {
 	GetByID(ctx context.Context, tenantID, id string) (*Transaction, error)
 	List(ctx context.Context, tenantID string, filter TransactionFilter) ([]Transaction, error)
 	Create(ctx context.Context, tx *Transaction) error
+	CreateWithInstallments(ctx context.Context, parent *Transaction, children []Transaction, tagIDs []string) error
 	Update(ctx context.Context, tx *Transaction) error
 	Delete(ctx context.Context, tenantID, id, userID string) error
 

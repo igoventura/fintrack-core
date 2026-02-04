@@ -37,7 +37,7 @@ func (h *TransactionHandler) Create(c *gin.Context) {
 	}
 
 	tx := req.ToDomain()
-	if err := h.service.Create(c.Request.Context(), tx, req.TagIDs); err != nil {
+	if err := h.service.Create(c.Request.Context(), tx, req.TagIDs, req.Installments, req.IsRecurring); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

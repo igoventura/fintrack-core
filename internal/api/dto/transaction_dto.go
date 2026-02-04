@@ -18,6 +18,8 @@ type CreateTransactionRequest struct {
 	DueDate         time.Time              `json:"due_date" binding:"required"`
 	PaymentDate     *time.Time             `json:"payment_date,omitempty"`
 	TagIDs          []string               `json:"tag_ids,omitempty" binding:"omitempty,dive,uuid"`
+	Installments    int                    `json:"installments,omitempty" binding:"omitempty,min=1"`
+	IsRecurring     bool                   `json:"is_recurring,omitempty"`
 }
 
 // TransactionResponse represents the API response for a transaction.

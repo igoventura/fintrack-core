@@ -140,6 +140,11 @@ definitions:
         type: string
       from_account_id:
         type: string
+      installments:
+        minimum: 1
+        type: integer
+      is_recurring:
+        type: boolean
       payment_date:
         type: string
       tag_ids:

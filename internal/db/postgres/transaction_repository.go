@@ -181,6 +181,97 @@ func (r *TransactionRepository) ListTransactionTags(ctx context.Context, transac
 	return tags, nil
 }
 
+func (r *TransactionRepository) CreateWithInstallments(ctx context.Context, parent *domain.Transaction, children []domain.Transaction, tagIDs []string) error {
+	tx, err := r.db.Pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback(ctx)
+
+	// 1. Insert Parent
+	queryParent := `INSERT INTO transactions (parent_transaction_id, tenant_id, from_account_id, to_account_id, currency, amount, accrual_month, transaction_type, category_id, comments, due_date, payment_date, created_by, updated_by)
+			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+			  RETURNING id, created_at, updated_at`
+
+	row := tx.QueryRow(ctx, queryParent, parent.ParentTransactionID, parent.TenantID, parent.FromAccountID, parent.ToAccountID, parent.Currency, parent.Amount, parent.AccrualMonth, parent.TransactionType, parent.CategoryID, parent.Comments, parent.DueDate, parent.PaymentDate, parent.CreatedBy, parent.UpdatedBy)
+	if err := row.Scan(&parent.ID, &parent.CreatedAt, &parent.UpdatedAt); err != nil {
+		return fmt.Errorf("failed to create parent transaction: %w", err)
+	}
+	parent.UpdatedBy = parent.CreatedBy
+
+	// Collect IDs for tag linking
+	allTransactionIDs := []string{parent.ID}
+
+	// 2. Insert Children (if any)
+	if len(children) > 0 {
+		// Prepare bulk insert
+		queryChildren := `INSERT INTO transactions (parent_transaction_id, tenant_id, from_account_id, to_account_id, currency, amount, accrual_month, transaction_type, category_id, comments, due_date, payment_date, created_by, updated_by) VALUES `
+		values := []interface{}{}
+		argIdx := 1
+
+		for _, child := range children {
+			// Link to Parent
+			child.ParentTransactionID = &parent.ID
+
+			queryChildren += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),",
+				argIdx, argIdx+1, argIdx+2, argIdx+3, argIdx+4, argIdx+5, argIdx+6, argIdx+7, argIdx+8, argIdx+9, argIdx+10, argIdx+11, argIdx+12, argIdx+13)
+
+			values = append(values, child.ParentTransactionID, child.TenantID, child.FromAccountID, child.ToAccountID, child.Currency, child.Amount, child.AccrualMonth, child.TransactionType, child.CategoryID, child.Comments, child.DueDate, child.PaymentDate, child.CreatedBy, child.UpdatedBy)
+			argIdx += 14
+		}
+
+		queryChildren = queryChildren[:len(queryChildren)-1] // Remove trailing comma
+		queryChildren += " RETURNING id"
+
+		rows, err := tx.Query(ctx, queryChildren, values...)
+		if err != nil {
+			return fmt.Errorf("failed to bulk insert children: %w", err)
+		}
+
+		childIdx := 0
+		for rows.Next() {
+			var id string
+			if err := rows.Scan(&id); err != nil {
+				rows.Close()
+				return fmt.Errorf("failed to scan child id: %w", err)
+			}
+			children[childIdx].ID = id // Update ID in struct if needed (though passed by value in slice, so local only)
+			allTransactionIDs = append(allTransactionIDs, id)
+			childIdx++
+		}
+		rows.Close()
+		if rows.Err() != nil {
+			return fmt.Errorf("error iterating children rows: %w", rows.Err())
+		}
+	}
+
+	// 3. Link Tags to ALL transactions
+	if len(tagIDs) > 0 {
+		queryTags := `INSERT INTO transactions_tags (transaction_id, tag_id) VALUES `
+		tagValues := []interface{}{}
+		argIdx := 1
+
+		for _, txID := range allTransactionIDs {
+			for _, tagID := range tagIDs {
+				queryTags += fmt.Sprintf("($%d, $%d),", argIdx, argIdx+1)
+				tagValues = append(tagValues, txID, tagID)
+				argIdx += 2
+			}
+		}
+		queryTags = queryTags[:len(queryTags)-1] // Remove trailing comma
+
+		if _, err := tx.Exec(ctx, queryTags, tagValues...); err != nil {
+			return fmt.Errorf("failed to link tags: %w", err)
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("failed to commit: %w", err)
+	}
+
+	return nil
+}
+
 func (r *TransactionRepository) AddAttachment(ctx context.Context, a *domain.TransactionAttachment) error {
 	query := `INSERT INTO transaction_attachments (transaction_id, name, path, created_by, updated_by)
 			  VALUES ($1, $2, $3, $4, $5)

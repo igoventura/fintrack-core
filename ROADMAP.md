@@ -55,14 +55,14 @@ The heart of the application: tracking money movement.
       - [x] Implement `TransactionHandler`.
       - [x] Register Routes.
   - [x] Link to Categories and Tags
-  - [ ] **Transaction Logic Rules**:
-    - [ ] **Fields**:
+  - [x] **Transaction Logic Rules**:
+    - [x] **Fields**:
       - `FromAccountID`: Source account.
       - `ToAccountID`: Recipient account (triggers credit transaction for transfers/payments).
       - `TenantID`: From context.
       - `AccrualMonth` (YYYYMM): Defaults to due date's month, or explicit from frontend.
       - `PaymentDate`: Tracks payment status. For CC, defaults to Due Date (except Payment transaction).
-    - [ ] **Credit Card Installments**:
+    - [x] **Credit Card Installments**:
       - Input: `installments` (int) + `accrual_month`.
       - Logic: Splits value, generates N transactions.
       - Rounding: First installment absorbs remainder (e.g. 10/3 -> 3.34, 3.33, 3.33). Sum must match Amount.
