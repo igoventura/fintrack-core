@@ -3,6 +3,7 @@
 This document tracks the implementation status of FinTrack Core features.
 
 ## Phase 1: Foundation (Current Status: 100%)
+
 Core infrastructure and user management.
 
 - [x] **Project Structure**: Clean Architecture setup, folders, Makefiles.
@@ -17,9 +18,10 @@ Core infrastructure and user management.
   - [x] Auth Service (Register/Login)
   - [x] API: Get/Update Profile
   - [x] API: List User Tenants
-- [x] **Accounts**: Account Domain, Repository, Service, API Handlers.
+- [x] **Accounts**: Account Domain, Repository, Service, API Handlers (CRUD).
 
 ## Phase 2: Core Classification (Next Priorities)
+
 Organizing financial data.
 
 - [x] **Categories** (authenticated endpoint and tenant-scoped)
@@ -33,27 +35,28 @@ Organizing financial data.
   - [x] API Handlers & Routes
 
 ## Phase 3: Financial Core
+
 The heart of the application: tracking money movement.
 
 - [ ] **Transactions** (authenticated endpoint and tenant-scoped) - **IN PROGRESS**
   - [x] Schema Migration
-      - [x] Add `currency` column to `transactions` table.
-      - [x] Remove `previous_sibling_transaction_id` and `next_sibling_transaction_id`.
-      - [x] Add `parent_transaction_id` column for splitting transactions.
-      - [x] Add `parent_transaction_id` column for splitting transactions.
-      - [x] Refactor `transactions_tags`: Removed audit columns (simple join table).
+    - [x] Add `currency` column to `transactions` table.
+    - [x] Remove `previous_sibling_transaction_id` and `next_sibling_transaction_id`.
+    - [x] Add `parent_transaction_id` column for splitting transactions.
+    - [x] Add `parent_transaction_id` column for splitting transactions.
+    - [x] Refactor `transactions_tags`: Removed audit columns (simple join table).
   - [x] Domain & Repository
-      - [x] Update `Transaction` entity.
-      - [x] Update `TransactionRepository` (CRUD + Filters).
-      - [x] Update `TransactionRepository` for bulk tag insertion (`AddTagsToTransaction` & `ReplaceTags`).
+    - [x] Update `Transaction` entity.
+    - [x] Update `TransactionRepository` (CRUD + Filters).
+    - [x] Update `TransactionRepository` for bulk tag insertion (`AddTagsToTransaction` & `ReplaceTags`).
   - [x] Service Layer
-      - [x] Implement `CreateTransaction` with default currency and tag association.
-      - [x] Implement `UpdateTransaction` with Tag Replacement (Upsert) logic.
-      - [x] Basic validation (Tenant Isolation).
+    - [x] Implement `CreateTransaction` with default currency and tag association.
+    - [x] Implement `UpdateTransaction` with Tag Replacement (Upsert) logic.
+    - [x] Basic validation (Tenant Isolation).
   - [x] API Layer
-      - [x] Create DTOs.
-      - [x] Implement `TransactionHandler`.
-      - [x] Register Routes.
+    - [x] Create DTOs.
+    - [x] Implement `TransactionHandler`.
+    - [x] Register Routes.
   - [x] Link to Categories and Tags
   - [x] **Transaction Logic Rules**:
     - [x] **Fields**:
@@ -69,6 +72,7 @@ The heart of the application: tracking money movement.
       - Due Dates: Calculated based on accrual month + 1 month. Handles month-end logic (31st -> 28th/29th).
 
 ## Phase 4: Extensions
+
 Advanced features.
 
 - [ ] **Credit Card Management** (authenticated endpoint and tenant-scoped)
@@ -91,10 +95,11 @@ Advanced features.
 - [ ] **Transaction Attachments** (authenticated endpoint and tenant-scoped)
   - [x] Schema Support
   - [ ] File Upload Logic (Service)
-  - [ ] Storage Provider Integration (e.g. S3/Supabase Storage) - *Pending Design*
+  - [ ] Storage Provider Integration (e.g. S3/Supabase Storage) - _Pending Design_
   - [ ] API Handlers
 
 ## Infrastructure & Quality
+
 Ongoing improvements.
 
 - [x] Docker Composition (DB + App)

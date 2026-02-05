@@ -57,12 +57,15 @@ go get github.com/igoventura/fintrack-api
 The API can be run locally via Docker (recommended) or standalone.
 
 #### Using Docker (Infrastructure included)
+
 ```bash
 make compose
 ```
+
 Once running, the API is available at `http://localhost:8080`.
 
 #### Standalone Execution
+
 ```bash
 # Ensure .env is configured
 go run cmd/api/main.go
@@ -77,11 +80,13 @@ The API automatically serves interactive documentation generated from code annot
 - **OpenAPI Spec**: [http://localhost:8080/swagger.yaml](http://localhost:8080/swagger.yaml)
 
 To update the documentation after changing code annotations, run:
+
 ```bash
 make swagger
 ```
 
 ### Health Check
+
 ```bash
 curl http://localhost:8080/health
 ```
@@ -89,14 +94,25 @@ curl http://localhost:8080/health
 ## Authentication
 
 FinTrack Core uses **Supabase Authentication** for secure identity management.
+
 - **Identity Provider**: Supabase Auth (JWT).
 - **Validation**: Server-side JWT validation using the `internal/auth` package, which verifies tokens against Supabase's JWKS.
 - **Internal Mapping**: Users are linked via a `supabase_id` column in the `users` table.
+
+#### Refresh Token
+
+- **Endpoint**: `POST /auth/refresh-token`
+- **Security**: Public endpoint (uses Refresh Token payload)
+- **Input**: Refresh Token
+- **Process**: Proxies request to Supabase Auth to get new tokens
+- **Response**: New JWT access and refresh tokens
+
 - **Middleware**: `AuthMiddleware` extracts the Bearer token, validates it, and injects the user context into the request.
 
 ## Multi-tenancy
 
 FinTrack Core supports strict multi-tenancy via request headers.
+
 - **Header**: `X-Tenant-ID` (Required)
 - **Validation**: `TenantMiddleware` validates the existence of the tenant in the database. Returns `401 Unauthorized` if invalid or missing.
 - **Context**: Successfully validated tenant IDs are injected into the request context (`domain.WithTenantID`).
@@ -105,13 +121,13 @@ FinTrack Core supports strict multi-tenancy via request headers.
 ## CORS (Cross-Origin Resource Sharing)
 
 FinTrack Core includes CORS support to enable secure cross-origin requests from frontend applications.
+
 - **Middleware**: `gin-contrib/cors` is configured in the router to handle CORS requests.
 - **Allowed Origin**: `http://localhost:4200` (Angular development server).
 - **Allowed Methods**: GET, POST, PUT, DELETE, OPTIONS.
-- **Allowed Headers**: `Origin`, `Content-Type`, `Authorization`, `X-Tenant-ID`.
+- **Allowed Headers**: `Origin`, `Content-Type`, `Content-Length`, `Accept-Encoding`, `X-CSRF-Token`, `Authorization`, `Accept`, `Cache-Control`, `X-Requested-With`, `X-Tenant-ID`, `DNT`, `Keep-Alive`, `User-Agent`, `If-Modified-Since`.
 - **Credentials**: Enabled to support authentication tokens and cookies.
 - **Configuration**: For production deployments, update the `AllowOrigins` in `internal/api/router/router.go` to include your production frontend domain.
-
 
 ## Soft Delete Policy
 
