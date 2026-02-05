@@ -81,13 +81,14 @@ func (s *SupabaseAuthService) Login(ctx context.Context, email, password string)
 }
 
 func (s *SupabaseAuthService) UpdateUser(ctx context.Context, user *domain.User) error {
+	token := domain.GetToken(ctx)
 	updateUserRequest := types.UpdateUserRequest{
 		Email: user.Email,
 		Data: map[string]any{
 			"full_name": user.Name,
 		},
 	}
-	if _, err := s.client.UpdateUser(updateUserRequest); err != nil {
+	if _, err := s.client.WithToken(token).UpdateUser(updateUserRequest); err != nil {
 		return err
 	}
 

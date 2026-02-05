@@ -54,6 +54,7 @@ func (m *AuthMiddleware) Handle() gin.HandlerFunc {
 
 		c.Set(UserIDKey, user.ID)
 		ctx := domain.WithUserID(c.Request.Context(), user.ID)
+		ctx = domain.WithToken(ctx, tokenString)
 		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()

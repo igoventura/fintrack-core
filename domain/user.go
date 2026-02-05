@@ -43,6 +43,7 @@ type UserRepository interface {
 }
 
 const userIdKey contextKey = "userID"
+const tokenKey contextKey = "token"
 
 func WithUserID(ctx context.Context, userID string) context.Context {
 	return context.WithValue(ctx, userIdKey, userID)
@@ -50,6 +51,14 @@ func WithUserID(ctx context.Context, userID string) context.Context {
 
 func GetUserID(ctx context.Context) string {
 	return ctx.Value(userIdKey).(string)
+}
+
+func WithToken(ctx context.Context, token string) context.Context {
+	return context.WithValue(ctx, tokenKey, token)
+}
+
+func GetToken(ctx context.Context) string {
+	return ctx.Value(tokenKey).(string)
 }
 
 func (u *User) IsValid() (bool, map[string]error) {
