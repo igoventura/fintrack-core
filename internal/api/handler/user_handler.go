@@ -66,12 +66,21 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	// map req to user
 	userID := domain.GetUserID(c.Request.Context())
+
+	// get original user
+	originalUser, err := h.userService.GetUser(c.Request.Context(), userID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	// map req to user
 	user := &domain.User{
-		ID:    userID,
-		Name:  req.Name,
-		Email: req.Email,
+		ID:         userID,
+		Name:       req.Name,
+		Email:      req.Email,
+		SupabaseID: originalUser.SupabaseID,
 	}
 
 	// validate user
@@ -79,13 +88,6 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	if !isValid {
 		jsonString, _ := json.Marshal(validationError)
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: string(jsonString)})
-		return
-	}
-
-	// get original user
-	originalUser, err := h.userService.GetUser(c.Request.Context(), userID)
-	if err != nil {
-		c.JSON(http.StatusNotFound, ErrorResponse{Error: err.Error()})
 		return
 	}
 
