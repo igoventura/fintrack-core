@@ -12,6 +12,7 @@ import (
 type AuthService interface {
 	Register(ctx context.Context, email, password, fullName string) (*dto.AuthResponse, error)
 	Login(ctx context.Context, email, password string) (*dto.AuthResponse, error)
+	RefreshToken(ctx context.Context, refreshToken string) (*dto.AuthResponse, error)
 }
 
 type SupabaseAuthService struct {
@@ -93,4 +94,20 @@ func (s *SupabaseAuthService) UpdateUser(ctx context.Context, user *domain.User)
 	}
 
 	return nil
+}
+
+func (s *SupabaseAuthService) RefreshToken(ctx context.Context, refreshToken string) (*dto.AuthResponse, error) {
+	resp, err := s.client.RefreshToken(refreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.AuthResponse{
+		AccessToken:  resp.AccessToken,
+		RefreshToken: resp.RefreshToken,
+		User: dto.User{
+			ID:    resp.User.ID.String(),
+			Email: resp.User.Email,
+		},
+	}, nil
 }

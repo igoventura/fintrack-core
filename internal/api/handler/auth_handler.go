@@ -71,3 +71,30 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, resp)
 }
+
+// RefreshToken godoc
+// @Summary Refresh access token
+// @Description Refresh access token using refresh token
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param request body dto.RefreshTokenRequest true "Refresh Token Request"
+// @Success 200 {object} dto.AuthResponse
+// @Failure 400 {object} handler.ErrorResponse
+// @Failure 401 {object} handler.ErrorResponse
+// @Router /auth/refresh-token [post]
+func (h *AuthHandler) RefreshToken(c *gin.Context) {
+	var req dto.RefreshTokenRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ErrorJSON(c, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	resp, err := h.service.RefreshToken(c.Request.Context(), req.RefreshToken)
+	if err != nil {
+		ErrorJSON(c, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}

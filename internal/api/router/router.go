@@ -17,8 +17,8 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 	// CORS configuration
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:4200"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-Tenant-ID"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "Accept", "Cache-Control", "X-Requested-With", "X-Tenant-ID", "X-Tenant-Id", "DNT", "Keep-Alive", "User-Agent", "If-Modified-Since"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
@@ -84,6 +84,7 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 	{
 		auth.POST("/register", authHandler.Register)
 		auth.POST("/login", authHandler.Login)
+		auth.POST("/refresh-token", authHandler.RefreshToken)
 	}
 
 	// User routes
