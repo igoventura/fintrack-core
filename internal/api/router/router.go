@@ -43,6 +43,8 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 		accounts.GET("/", accountHandler.List)
 		accounts.POST("/", accountHandler.Create)
 		accounts.GET("/:id", accountHandler.Get)
+		accounts.PUT("/:id", accountHandler.Update)
+		accounts.DELETE("/:id", accountHandler.Delete)
 	}
 
 	// Category routes

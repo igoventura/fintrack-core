@@ -261,6 +261,19 @@ definitions:
       updated_by:
         type: string
     type: object
+  dto.UpdateAccountRequest:
+    properties:
+      color:
+        type: string
+      icon:
+        type: string
+      initial_balance:
+        type: number
+      name:
+        type: string
+    required:
+    - name
+    type: object
   dto.UpdateCategoryRequest:
     properties:
       color:
@@ -398,6 +411,39 @@ paths:
       tags:
       - accounts
   /accounts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete an account by ID
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Tenant ID
+        in: header
+        name: X-Tenant-ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - AuthPassword: []
+      summary: Delete an account
+      tags:
+      - accounts
     get:
       consumes:
       - application/json
@@ -422,6 +468,47 @@ paths:
       security:
       - AuthPassword: []
       summary: Get an account
+      tags:
+      - accounts
+    put:
+      consumes:
+      - application/json
+      description: update an existing account (cannot change type or currency)
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update account
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateAccountRequest'
+      - description: Tenant ID
+        in: header
+        name: X-Tenant-ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AccountResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - AuthPassword: []
+      summary: Update an account
       tags:
       - accounts
   /auth/login:

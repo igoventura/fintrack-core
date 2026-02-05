@@ -58,8 +58,8 @@ func (r *AccountRepository) Create(ctx context.Context, a *domain.Account) error
 }
 
 func (r *AccountRepository) Update(ctx context.Context, a *domain.Account) error {
-	query := `UPDATE accounts SET name = $2, initial_balance = $3, color = $4, currency = $5, icon = $6, type = $7, updated_at = CURRENT_TIMESTAMP, updated_by = $8 WHERE id = $1 AND tenant_id = $9 RETURNING updated_at`
-	row := r.db.Pool.QueryRow(ctx, query, a.ID, a.Name, a.InitialBalance, a.Color, a.Currency, a.Icon, a.Type, a.UpdatedBy, a.TenantID)
+	query := `UPDATE accounts SET name = $2, initial_balance = $3, color = $4, icon = $5, updated_at = CURRENT_TIMESTAMP, updated_by = $6 WHERE id = $1 AND tenant_id = $7 RETURNING updated_at`
+	row := r.db.Pool.QueryRow(ctx, query, a.ID, a.Name, a.InitialBalance, a.Color, a.Icon, a.UpdatedBy, a.TenantID)
 	if err := row.Scan(&a.UpdatedAt); err != nil {
 		return fmt.Errorf("failed to update account: %w", err)
 	}

@@ -59,3 +59,24 @@ func (r *CreateAccountRequest) ToEntity(creatorID string, tenantID string) *doma
 		UpdatedBy:      creatorID,
 	}
 }
+
+type UpdateAccountRequest struct {
+	Name           string  `json:"name" validate:"required"`
+	InitialBalance float64 `json:"initial_balance"`
+	Color          string  `json:"color"`
+	Icon           string  `json:"icon"`
+}
+
+func (r *UpdateAccountRequest) ToEntity(id string, userID string) *domain.Account {
+	now := time.Now()
+	// Note: Type, Currency and TenantID are not updatable. TenantID is used for scoping (WHERE clause).
+	return &domain.Account{
+		ID:             id,
+		Name:           r.Name,
+		InitialBalance: r.InitialBalance,
+		Color:          r.Color,
+		Icon:           r.Icon,
+		UpdatedAt:      now,
+		UpdatedBy:      userID,
+	}
+}
