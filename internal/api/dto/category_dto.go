@@ -4,6 +4,7 @@ import "time"
 
 type CreateCategoryRequest struct {
 	Name             string  `json:"name" binding:"required"`
+	Type             string  `json:"type" binding:"required,oneof=income expense transfer"`
 	ParentCategoryID *string `json:"parent_category_id,omitempty"`
 	Color            string  `json:"color"`
 	Icon             string  `json:"icon"`
@@ -21,6 +22,7 @@ type CategoryResponse struct {
 	ParentCategoryID *string   `json:"parent_category_id,omitempty"`
 	TenantID         string    `json:"tenant_id"`
 	Name             string    `json:"name"`
+	Type             string    `json:"type"`
 	Color            string    `json:"color"`
 	Icon             string    `json:"icon"`
 	CreatedAt        time.Time `json:"created_at"`

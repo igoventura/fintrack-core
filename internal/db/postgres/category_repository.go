@@ -16,10 +16,10 @@ func NewCategoryRepository(db *DB) *CategoryRepository {
 }
 
 func (r *CategoryRepository) GetByID(ctx context.Context, id, tenantID string) (*domain.Category, error) {
-	query := `SELECT id, parent_category, tenant_id, name, deactivated_at, color, icon, created_at, created_by, updated_at, updated_by, deactivated_by FROM categories WHERE id = $1 AND tenant_id = $2 AND deactivated_at IS NULL`
+	query := `SELECT id, parent_category, tenant_id, name, type, deactivated_at, color, icon, created_at, created_by, updated_at, updated_by, deactivated_by FROM categories WHERE id = $1 AND tenant_id = $2 AND deactivated_at IS NULL`
 	var c domain.Category
 	err := r.db.Pool.QueryRow(ctx, query, id, tenantID).Scan(
-		&c.ID, &c.ParentCategoryID, &c.TenantID, &c.Name, &c.DeactivatedAt, &c.Color, &c.Icon,
+		&c.ID, &c.ParentCategoryID, &c.TenantID, &c.Name, &c.Type, &c.DeactivatedAt, &c.Color, &c.Icon,
 		&c.CreatedAt, &c.CreatedBy, &c.UpdatedAt, &c.UpdatedBy, &c.DeactivatedBy,
 	)
 	if err != nil {
@@ -29,7 +29,7 @@ func (r *CategoryRepository) GetByID(ctx context.Context, id, tenantID string) (
 }
 
 func (r *CategoryRepository) List(ctx context.Context, tenantID string) ([]domain.Category, error) {
-	query := `SELECT id, parent_category, tenant_id, name, deactivated_at, color, icon, created_at, created_by, updated_at, updated_by, deactivated_by FROM categories WHERE tenant_id = $1 AND deactivated_at IS NULL`
+	query := `SELECT id, parent_category, tenant_id, name, type, deactivated_at, color, icon, created_at, created_by, updated_at, updated_by, deactivated_by FROM categories WHERE tenant_id = $1 AND deactivated_at IS NULL`
 	rows, err := r.db.Pool.Query(ctx, query, tenantID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list categories: %w", err)
@@ -39,7 +39,7 @@ func (r *CategoryRepository) List(ctx context.Context, tenantID string) ([]domai
 	var categories []domain.Category
 	for rows.Next() {
 		var c domain.Category
-		if err := rows.Scan(&c.ID, &c.ParentCategoryID, &c.TenantID, &c.Name, &c.DeactivatedAt, &c.Color, &c.Icon, &c.CreatedAt, &c.CreatedBy, &c.UpdatedAt, &c.UpdatedBy, &c.DeactivatedBy); err != nil {
+		if err := rows.Scan(&c.ID, &c.ParentCategoryID, &c.TenantID, &c.Name, &c.Type, &c.DeactivatedAt, &c.Color, &c.Icon, &c.CreatedAt, &c.CreatedBy, &c.UpdatedAt, &c.UpdatedBy, &c.DeactivatedBy); err != nil {
 			return nil, fmt.Errorf("failed to scan category: %w", err)
 		}
 		categories = append(categories, c)
@@ -48,10 +48,10 @@ func (r *CategoryRepository) List(ctx context.Context, tenantID string) ([]domai
 }
 
 func (r *CategoryRepository) Create(ctx context.Context, c *domain.Category) error {
-	query := `INSERT INTO categories (parent_category, tenant_id, name, color, icon, created_by, updated_by)
-			  VALUES ($1, $2, $3, $4, $5, $6, $7)
+	query := `INSERT INTO categories (parent_category, tenant_id, name, type, color, icon, created_by, updated_by)
+			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 			  RETURNING id, created_at, updated_at`
-	row := r.db.Pool.QueryRow(ctx, query, c.ParentCategoryID, c.TenantID, c.Name, c.Color, c.Icon, c.CreatedBy, c.UpdatedBy)
+	row := r.db.Pool.QueryRow(ctx, query, c.ParentCategoryID, c.TenantID, c.Name, c.Type, c.Color, c.Icon, c.CreatedBy, c.UpdatedBy)
 	if err := row.Scan(&c.ID, &c.CreatedAt, &c.UpdatedAt); err != nil {
 		return fmt.Errorf("failed to create category: %w", err)
 	}

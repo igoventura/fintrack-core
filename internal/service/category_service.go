@@ -52,20 +52,28 @@ func (s *CategoryService) UpdateCategory(ctx context.Context, category *domain.C
 	tenantID := domain.GetTenantID(ctx)
 	category.TenantID = tenantID
 
-	// 1. Validate input
-	isValid, validationErrors := category.IsValid()
+	// 1. Fetch existing category to get immutable fields (Type, etc.)
+	existingCategory, err := s.repo.GetByID(ctx, category.ID, tenantID)
+	if err != nil {
+		return fmt.Errorf("service failed to get category for update (or unauthorized): %w", err)
+	}
+
+	// 2. Merge updates
+	existingCategory.Name = category.Name
+	existingCategory.ParentCategoryID = category.ParentCategoryID
+	existingCategory.Color = category.Color
+	existingCategory.Icon = category.Icon
+	existingCategory.UpdatedBy = domain.GetUserID(ctx)
+	// Type is immutable, so we naturally keep existingCategory.Type
+
+	// 3. Validate merged category
+	isValid, validationErrors := existingCategory.IsValid()
 	if !isValid {
 		return fmt.Errorf("invalid category: %v", validationErrors)
 	}
 
-	// 2. Check existence and ownership (Tenant Isolation)
-	// We just check if it exists for this tenant
-	if _, err := s.repo.GetByID(ctx, category.ID, tenantID); err != nil {
-		return fmt.Errorf("service failed to get category for update (or unauthorized): %w", err)
-	}
-
-	// 3. Update
-	if err := s.repo.Update(ctx, category); err != nil {
+	// 4. Update
+	if err := s.repo.Update(ctx, existingCategory); err != nil {
 		return fmt.Errorf("service failed to update category: %w", err)
 	}
 	return nil
