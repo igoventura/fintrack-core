@@ -18,7 +18,7 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:4200"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "Accept", "Cache-Control", "X-Requested-With", "X-Tenant-ID", "X-Tenant-Id", "DNT", "Keep-Alive", "User-Agent", "If-Modified-Since"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "Accept", "Cache-Control", "X-Requested-With", "X-Tenant-ID", "DNT", "Keep-Alive", "User-Agent", "If-Modified-Since", "sec-ch-ua", "sec-ch-ua-mobile", "sec-ch-ua-platform"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
@@ -33,15 +33,15 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 	tenants := r.Group("/tenants")
 	tenants.Use(authMiddleware.Handle())
 	{
-		tenants.POST("/", tenantHandler.Create)
+		tenants.POST("", tenantHandler.Create)
 	}
 
 	// Account routes
 	accounts := r.Group("/accounts")
 	accounts.Use(authMiddleware.Handle(), tenantMiddleware.Handle(false))
 	{
-		accounts.GET("/", accountHandler.List)
-		accounts.POST("/", accountHandler.Create)
+		accounts.GET("", accountHandler.List)
+		accounts.POST("", accountHandler.Create)
 		accounts.GET("/:id", accountHandler.Get)
 		accounts.PUT("/:id", accountHandler.Update)
 		accounts.DELETE("/:id", accountHandler.Delete)
@@ -51,8 +51,8 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 	categories := r.Group("/categories")
 	categories.Use(authMiddleware.Handle(), tenantMiddleware.Handle(false))
 	{
-		categories.GET("/", categoryHandler.ListCategories)
-		categories.POST("/", categoryHandler.CreateCategory)
+		categories.GET("", categoryHandler.ListCategories)
+		categories.POST("", categoryHandler.CreateCategory)
 		categories.GET("/:id", categoryHandler.GetCategory)
 		categories.PUT("/:id", categoryHandler.UpdateCategory)
 		categories.DELETE("/:id", categoryHandler.DeleteCategory)
@@ -62,8 +62,8 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 	tags := r.Group("/tags")
 	tags.Use(authMiddleware.Handle(), tenantMiddleware.Handle(false))
 	{
-		tags.GET("/", tagHandler.ListTags)
-		tags.POST("/", tagHandler.CreateTag)
+		tags.GET("", tagHandler.ListTags)
+		tags.POST("", tagHandler.CreateTag)
 		tags.GET("/:id", tagHandler.GetTag)
 		tags.PUT("/:id", tagHandler.UpdateTag)
 		tags.DELETE("/:id", tagHandler.DeleteTag)
@@ -73,8 +73,8 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 	transactions := r.Group("/transactions")
 	transactions.Use(authMiddleware.Handle(), tenantMiddleware.Handle(false))
 	{
-		transactions.GET("/", transactionHandler.List)
-		transactions.POST("/", transactionHandler.Create)
+		transactions.GET("", transactionHandler.List)
+		transactions.POST("", transactionHandler.Create)
 		transactions.GET("/:id", transactionHandler.GetByID)
 		transactions.PUT("/:id", transactionHandler.Update)
 		transactions.DELETE("/:id", transactionHandler.Delete)
