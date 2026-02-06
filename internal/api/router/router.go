@@ -16,7 +16,7 @@ func NewRouter(accountHandler *handler.AccountHandler, authHandler *handler.Auth
 
 	// CORS configuration
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:4200"},
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "Accept", "Cache-Control", "X-Requested-With", "X-Tenant-ID", "DNT", "Keep-Alive", "User-Agent", "If-Modified-Since", "sec-ch-ua", "sec-ch-ua-mobile", "sec-ch-ua-platform"},
 		ExposeHeaders:    []string{"Content-Length"},
