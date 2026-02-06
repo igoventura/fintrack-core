@@ -995,17 +995,13 @@ paths:
               $ref: '#/definitions/dto.TransactionResponse'
             type: array
         "400":
-          description: Invalid query params
+          description: Bad Request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handler.ErrorResponse'
       security:
       - AuthPassword: []
       summary: List transactions
@@ -1035,17 +1031,13 @@ paths:
           schema:
             $ref: '#/definitions/dto.TransactionResponse'
         "400":
-          description: Invalid input
+          description: Bad Request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handler.ErrorResponse'
       security:
       - AuthPassword: []
       summary: Create a new transaction
@@ -1071,11 +1063,9 @@ paths:
         "204":
           description: No Content
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handler.ErrorResponse'
       security:
       - AuthPassword: []
       summary: Delete a transaction
@@ -1102,17 +1092,13 @@ paths:
           schema:
             $ref: '#/definitions/dto.TransactionResponse'
         "404":
-          description: Transaction not found
+          description: Not Found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handler.ErrorResponse'
       security:
       - AuthPassword: []
       summary: Get transaction by ID
@@ -1147,17 +1133,13 @@ paths:
           schema:
             $ref: '#/definitions/dto.TransactionResponse'
         "400":
-          description: Invalid input
+          description: Bad Request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handler.ErrorResponse'
       security:
       - AuthPassword: []
       summary: Update a transaction

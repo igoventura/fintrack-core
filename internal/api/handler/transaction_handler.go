@@ -26,19 +26,19 @@ func NewTransactionHandler(service *service.TransactionService) *TransactionHand
 // @Param X-Tenant-ID header string true "Tenant ID"
 // @Param transaction body dto.CreateTransactionRequest true "Transaction data"
 // @Success 201 {object} dto.TransactionResponse
-// @Failure 400 {object} map[string]string "Invalid input"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Failure 400 {object} handler.ErrorResponse
+// @Failure 500 {object} handler.ErrorResponse
 // @Router /transactions [post]
 func (h *TransactionHandler) Create(c *gin.Context) {
 	var req dto.CreateTransactionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ErrorJSON(c, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 
 	tx := req.ToDomain()
 	if err := h.service.Create(c.Request.Context(), tx, req.TagIDs, req.Installments, req.IsRecurring); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ErrorJSON(c, http.StatusInternalServerError, "Failed to create transaction")
 		return
 	}
 
@@ -54,18 +54,18 @@ func (h *TransactionHandler) Create(c *gin.Context) {
 // @Param X-Tenant-ID header string true "Tenant ID"
 // @Param id path string true "Transaction ID"
 // @Success 200 {object} dto.TransactionResponse
-// @Failure 404 {object} map[string]string "Transaction not found"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Failure 404 {object} handler.ErrorResponse
+// @Failure 500 {object} handler.ErrorResponse
 // @Router /transactions/{id} [get]
 func (h *TransactionHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	tx, err := h.service.GetByID(c.Request.Context(), id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ErrorJSON(c, http.StatusInternalServerError, "Failed to get transaction")
 		return
 	}
 	if tx == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "transaction not found"})
+		ErrorJSON(c, http.StatusNotFound, "Transaction not found")
 		return
 	}
 
@@ -83,19 +83,19 @@ func (h *TransactionHandler) GetByID(c *gin.Context) {
 // @Param account_id query string false "Account ID"
 // @Param transaction_type query string false "Transaction Type"
 // @Success 200 {array} dto.TransactionResponse
-// @Failure 400 {object} map[string]string "Invalid query params"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Failure 400 {object} handler.ErrorResponse
+// @Failure 500 {object} handler.ErrorResponse
 // @Router /transactions [get]
 func (h *TransactionHandler) List(c *gin.Context) {
 	var filterReq dto.TransactionFilterRequest
 	if err := c.ShouldBindQuery(&filterReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ErrorJSON(c, http.StatusBadRequest, "Invalid query parameters")
 		return
 	}
 
 	txs, err := h.service.List(c.Request.Context(), filterReq.ToDomain())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ErrorJSON(c, http.StatusInternalServerError, "Failed to list transactions")
 		return
 	}
 
@@ -122,14 +122,14 @@ func (h *TransactionHandler) List(c *gin.Context) {
 // @Param id path string true "Transaction ID"
 // @Param transaction body dto.CreateTransactionRequest true "Transaction data"
 // @Success 200 {object} dto.TransactionResponse
-// @Failure 400 {object} map[string]string "Invalid input"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Failure 400 {object} handler.ErrorResponse
+// @Failure 500 {object} handler.ErrorResponse
 // @Router /transactions/{id} [put]
 func (h *TransactionHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 	var req dto.CreateTransactionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ErrorJSON(c, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 
@@ -141,7 +141,7 @@ func (h *TransactionHandler) Update(c *gin.Context) {
 	// Current Service.Update implementation does NOT handle tags yet (Step 703: "Update tags? ... I'll leave Update basic for now").
 	// So we just call Update.
 	if err := h.service.Update(c.Request.Context(), tx, req.TagIDs); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ErrorJSON(c, http.StatusInternalServerError, "Failed to update transaction")
 		return
 	}
 
@@ -157,12 +157,12 @@ func (h *TransactionHandler) Update(c *gin.Context) {
 // @Param X-Tenant-ID header string true "Tenant ID"
 // @Param id path string true "Transaction ID"
 // @Success 204 "No Content"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Failure 500 {object} handler.ErrorResponse
 // @Router /transactions/{id} [delete]
 func (h *TransactionHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.service.Delete(c.Request.Context(), id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ErrorJSON(c, http.StatusInternalServerError, "Failed to delete transaction")
 		return
 	}
 
