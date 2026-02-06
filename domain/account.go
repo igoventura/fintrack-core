@@ -98,6 +98,11 @@ func (a *Account) IsValid() (bool, map[string]error) {
 	if a.Currency == "" {
 		err["currency"] = errors.New("currency is required")
 	}
+	if a.Color == "" {
+		err["color"] = errors.New("color is required")
+	} else if len(a.Color) > 128 {
+		err["color"] = errors.New("color must not exceed 128 characters")
+	}
 	if a.Type == "" {
 		err["type"] = errors.New("type is required")
 	} else {

@@ -50,6 +50,11 @@ func (c *Category) IsValid() (bool, map[string]error) {
 	if c.TenantID == "" {
 		err["tenant_id"] = errors.New("tenant_id is required")
 	}
+	if c.Color == "" {
+		err["color"] = errors.New("color is required")
+	} else if len(c.Color) > 128 {
+		err["color"] = errors.New("color must not exceed 128 characters")
+	}
 	if c.Type == "" {
 		err["type"] = errors.New("type is required")
 	} else {
