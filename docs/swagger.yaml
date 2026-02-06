@@ -303,6 +303,45 @@ definitions:
     required:
     - name
     type: object
+  dto.UpdateTransactionRequest:
+    properties:
+      accrual_month:
+        description: YYYYMM
+        type: string
+      amount:
+        type: number
+      category_id:
+        type: string
+      comments:
+        type: string
+      due_date:
+        type: string
+      from_account_id:
+        type: string
+      payment_date:
+        type: string
+      tag_ids:
+        items:
+          type: string
+        type: array
+      to_account_id:
+        type: string
+      transaction_type:
+        allOf:
+        - $ref: '#/definitions/domain.TransactionType'
+        enum:
+        - credit
+        - debit
+        - transfer
+        - payment
+    required:
+    - accrual_month
+    - amount
+    - category_id
+    - due_date
+    - from_account_id
+    - transaction_type
+    type: object
   dto.UpdateUserRequest:
     properties:
       email:
@@ -1124,7 +1163,7 @@ paths:
         name: transaction
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateTransactionRequest'
+          $ref: '#/definitions/dto.UpdateTransactionRequest'
       produces:
       - application/json
       responses:

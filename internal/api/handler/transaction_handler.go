@@ -120,14 +120,14 @@ func (h *TransactionHandler) List(c *gin.Context) {
 // @Security AuthPassword
 // @Param X-Tenant-ID header string true "Tenant ID"
 // @Param id path string true "Transaction ID"
-// @Param transaction body dto.CreateTransactionRequest true "Transaction data"
+// @Param transaction body dto.UpdateTransactionRequest true "Transaction data"
 // @Success 200 {object} dto.TransactionResponse
 // @Failure 400 {object} handler.ErrorResponse
 // @Failure 500 {object} handler.ErrorResponse
 // @Router /transactions/{id} [put]
 func (h *TransactionHandler) Update(c *gin.Context) {
 	id := c.Param("id")
-	var req dto.CreateTransactionRequest
+	var req dto.UpdateTransactionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		ErrorJSON(c, http.StatusBadRequest, "Invalid request payload")
 		return

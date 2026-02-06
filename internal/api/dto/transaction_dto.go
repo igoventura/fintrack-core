@@ -22,6 +22,21 @@ type CreateTransactionRequest struct {
 	IsRecurring     bool                   `json:"is_recurring,omitempty"`
 }
 
+// UpdateTransactionRequest represents the payload for updating a transaction.
+// Note: Installments and IsRecurring are not included as they only apply during creation.
+type UpdateTransactionRequest struct {
+	FromAccountID   string                 `json:"from_account_id" binding:"required,uuid"`
+	ToAccountID     *string                `json:"to_account_id,omitempty" binding:"omitempty,uuid"`
+	Amount          float64                `json:"amount" binding:"required,gt=0"`
+	AccrualMonth    string                 `json:"accrual_month" binding:"required,len=6"` // YYYYMM
+	TransactionType domain.TransactionType `json:"transaction_type" binding:"required,oneof=credit debit transfer payment"`
+	CategoryID      string                 `json:"category_id" binding:"required,uuid"`
+	Comments        *string                `json:"comments,omitempty"`
+	DueDate         time.Time              `json:"due_date" binding:"required"`
+	PaymentDate     *time.Time             `json:"payment_date,omitempty"`
+	TagIDs          []string               `json:"tag_ids,omitempty" binding:"omitempty,dive,uuid"`
+}
+
 // TransactionResponse represents the API response for a transaction.
 type TransactionResponse struct {
 	ID                  string                 `json:"id"`
@@ -47,6 +62,21 @@ type TransactionResponse struct {
 
 // ToDomain maps CreateTransactionRequest to domain.Transaction.
 func (req *CreateTransactionRequest) ToDomain() *domain.Transaction {
+	return &domain.Transaction{
+		FromAccountID:   req.FromAccountID,
+		ToAccountID:     req.ToAccountID,
+		Amount:          req.Amount,
+		AccrualMonth:    req.AccrualMonth,
+		TransactionType: req.TransactionType,
+		CategoryID:      req.CategoryID,
+		Comments:        req.Comments,
+		DueDate:         req.DueDate,
+		PaymentDate:     req.PaymentDate,
+	}
+}
+
+// ToDomain maps UpdateTransactionRequest to domain.Transaction.
+func (req *UpdateTransactionRequest) ToDomain() *domain.Transaction {
 	return &domain.Transaction{
 		FromAccountID:   req.FromAccountID,
 		ToAccountID:     req.ToAccountID,
